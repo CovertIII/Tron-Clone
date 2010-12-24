@@ -1,10 +1,10 @@
 typedef struct traillisttype *traillist;
 
-triallist traillist_init(void);
+traillist traillist_init(void);
 
 void traillist_update(traillist tlist, vector2 p, float dt);
 
-void trail_on(traillist tlist);
+int trail_on(traillist tlist);
 
 void trail_off(traillist tlist);
 

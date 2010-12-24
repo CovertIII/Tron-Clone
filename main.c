@@ -44,7 +44,7 @@ void init()
 
 	
 	
-	mygame = arena_init(100,0, windowWidth, windowHeight);
+	mygame = arena_init(1,0, windowWidth, windowHeight);
 }
 
 void numbers(int value){
@@ -114,8 +114,11 @@ void display(void) {
 
 void pressKey(unsigned char key, int xx, int yy) {
 	switch(key) {
-		case ' ':
+		case 'a':
 			sharp = 1;
+			break;
+		case 's':
+			arena_plyr_tg(mygame, 0);
 			break;
 		case 27 :
 			exit(0);
@@ -145,7 +148,7 @@ void SpressKey(int key, int xx, int yy) {
 
 void releaseKey(unsigned char key, int xx, int yy) {
 	switch (key) {
-		case ' ':
+		case 'a':
 			sharp = 0;
 			break;
 		default:

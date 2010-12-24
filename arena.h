@@ -43,7 +43,7 @@ int arena_ply_speed(arena arna, int plyr_id, int a);
  * On Exit: toggles between breaking a trail or starting a new one 
  *          if there is not trail.
  */
-int arean_ply_tg(arena arna, int plyr_id);
+int arena_plyr_tg(arena arna, int plyr_id);
 
 /**** arena_free: *****
  * On Entry: arna is and intialised arna

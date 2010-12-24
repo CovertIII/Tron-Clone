@@ -24,7 +24,7 @@ int plist_add(plist *list, vector2 p){
 	if(new_node==NULL)
 		{return 1;}
 	new_node->pt.p = p;
-	new_node->pt.t = 1.1f;
+	new_node->pt.t = 10.1f;
 	new_node->next = NULL;
 	
 	if(*list == NULL){
@@ -37,7 +37,7 @@ int plist_add(plist *list, vector2 p){
 	return 0;
 }
 
-void plist_update(plist list, float dt){
+int plist_update(plist list, float dt){
 	pnode *cycle = list;
 	pnode *prev = NULL;
 	
@@ -46,6 +46,9 @@ void plist_update(plist list, float dt){
 		cycle->pt.t -= dt;
 		
 		if (cycle->pt.t <= 0){
+			if (prev == NULL){
+				return 1;
+			}
 			pnode *temp = cycle;
 			prev->next = cycle->next;
 			cycle = cycle->next;
@@ -56,6 +59,7 @@ void plist_update(plist list, float dt){
 			cycle = cycle->next;	
 		}
 	}
+	return 0;
 }
 
 void plist_render(plist list){

@@ -73,8 +73,8 @@ int arena_ply_speed(arena arna, int plyr_id, int a){
 	player_speed(arna->actors[plyr_id], a);
 }
 
-void arena_plyr_tg(arena arna, int plyr_id){
-	//player_toggle(arna->actors[plyr_id]);
+int arena_plyr_tg(arena arna, int plyr_id){
+	player_toggle(arna->actors[plyr_id]);
 }
 
 void arena_free(arena arna){

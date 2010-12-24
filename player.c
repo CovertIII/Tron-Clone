@@ -5,7 +5,7 @@
 #include "player.h"
 #include "vector2.h"
 #include "math.h"
-#include "plist.h"
+#include "traillist.h"
 
 #define VELOCITY 100
 #define MIN_VEL 30
@@ -20,12 +20,8 @@ typedef struct playertype {
 	float th;
 	float w;
 	float length;
-	
-	float timer;
-	
-	plist trail;
-	plist col_trail;
-	
+	int trailtoggle;	
+	traillist trails;	
 } playertype;
 
 player player_init(int x, int y, double th){
@@ -45,14 +41,8 @@ player player_init(int x, int y, double th){
 	plyr->v.y = VELOCITY*sin(th);
 	plyr->length = LENGTH;
 	
-	plyr->timer = 0;
-	
-	plyr->trail = NULL;
-	plyr->col_trail = NULL;
-	
-	vector2 tmp = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
-	
-	plist_add(&plyr->col_trail, tmp);
+	plyr->trailtoggle = 1;
+	plyr->trails = traillist_init();	
 	
 	return plyr;
 }
@@ -67,18 +57,10 @@ void player_update(player plyr, double dt){
 	plyr->p.x += plyr->v.x*dt;
 	plyr->p.y += plyr->v.y*dt;
 	
-	plyr->timer += dt;
 	
 	vector2 tmp = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	
-	plist_update(plyr->trail, dt);
-	plist_add(&plyr->trail, tmp);
-	
-	plist_update(plyr->col_trail, dt);
-	if (plyr->timer > 0.1){
-		plist_add(&plyr->col_trail, tmp);
-		plyr->timer = 0;
-	}
+	traillist_update(plyr->trails, tmp, dt);	
 }
 
 void player_turn(player plyr, int dir){
@@ -94,6 +76,17 @@ void player_speed(player plyr, int a){
 
 }
 
+void player_toggle(player plyr){
+	if(plyr->trailtoggle ==1){
+		plyr->trailtoggle = 0;
+		trail_off(plyr->trails);
+	}
+	else{
+		plyr->trailtoggle = 1;
+		trail_on(plyr->trails);
+	}
+}
+
 void player_render(player plyr){
 	glPushMatrix();
 	glLineWidth(3.0);
@@ -104,9 +97,7 @@ void player_render(player plyr){
 	glEnd();
 	
 	glLineWidth(2.0);
-	plist_render(plyr->trail);
-	//plist_render(plyr->col_trail);
-	
+	traillist_render(plyr->trails);
 	glPopMatrix();
 }
 
