@@ -7,28 +7,16 @@
 
 #define TRUE 1
 #define FALSE 0
-#define TIMERMSECS 1
+#define TIMERMSECS 17
 
 int lastFrameTime = 0;
 int frame=0,time, fps, timebase=0;
 
 vector2 movin = {0,0};
 vector2 mouse = {0,0};
+int sharp=0;
 
 arena mygame;
-
-void circle_object(float pos_x, float pos_y, float size) {
-	glPushMatrix();
-	glTranslatef(pos_x,pos_y,0);
-	float counter;
-	glBegin(GL_POLYGON);
-	for (counter = 0; counter <= 2*3.14159; counter = counter + 3.14159/12) {
-		glVertex3f ((size)*cos(counter), (size)*sin(counter), 0.0);
-	}
-    glEnd();
-	glPopMatrix();
-}	
-
 
 void renderBitmapString(
 						float x, 
@@ -44,9 +32,19 @@ void renderBitmapString(
 
 void init()
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	
 	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-	mygame = arena_init(10,0, windowWidth, windowHeight);
+
+	
+	
+	mygame = arena_init(100,0, windowWidth, windowHeight);
 }
 
 void numbers(int value){
@@ -62,6 +60,20 @@ void numbers(int value){
     lastFrameTime = now;
 	float h = elapsedTime;
 	
+	
+	if (movin.x == -1)
+		{sharp ? arena_ply_turn(mygame, 0, 7) : arena_ply_turn(mygame, 0, 3);}
+	else if (movin.x == 1)
+		{sharp ? arena_ply_turn(mygame, 0, -7) : arena_ply_turn(mygame, 0, -3);}
+	else if (movin.x == 0)
+		{ arena_ply_turn(mygame, 0, 0);}
+	if (movin.y == -1)
+		{arena_ply_speed(mygame, 0, -500);}
+	else if (movin.y == 1)
+		{arena_ply_speed(mygame, 0,  500);}
+	else if (movin.y == 0)
+		{arena_ply_speed(mygame, 0, 0);}
+	
 	arena_update(mygame, h);
 	glutPostRedisplay();
 }
@@ -72,8 +84,6 @@ void display(void) {
 	int i,j;
 	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-
-	//numbers();
 	
 	//-----This is the stuff involved with drawing the screen----//	
 	glClearColor (0.8, 0.8,0.8,0);
@@ -104,11 +114,8 @@ void display(void) {
 
 void pressKey(unsigned char key, int xx, int yy) {
 	switch(key) {
-		case '1':
-			
-			break;
 		case ' ':
-			
+			sharp = 1;
 			break;
 		case 27 :
 			exit(0);
@@ -121,10 +128,10 @@ void pressKey(unsigned char key, int xx, int yy) {
 void SpressKey(int key, int xx, int yy) {
 	switch(key) {
 		case GLUT_KEY_LEFT:
-			arena_ply_turn(mygame, 0, -3);
+			movin.x=-1;
 			break;
 		case GLUT_KEY_RIGHT:
-			arena_ply_turn(mygame, 0,  3);
+			movin.x=1;
 			break;
 		case GLUT_KEY_UP:
 			movin.y=1;
@@ -138,6 +145,9 @@ void SpressKey(int key, int xx, int yy) {
 
 void releaseKey(unsigned char key, int xx, int yy) {
 	switch (key) {
+		case ' ':
+			sharp = 0;
+			break;
 		default:
 			break;
 	}
@@ -146,10 +156,12 @@ void releaseKey(unsigned char key, int xx, int yy) {
 void SreleaseKey(int key, int xx, int yy) {
 	switch(key) {
 		case GLUT_KEY_LEFT:
-			arena_ply_turn(mygame, 0, 0);
+			if(movin.x<0)
+			movin.x=0;
 			break;
 		case GLUT_KEY_RIGHT:
-			arena_ply_turn(mygame, 0, 0);
+			if(movin.x>0)
+			movin.x=0;
 			break;
 		case GLUT_KEY_UP:
 			if(movin.y>0)

@@ -18,6 +18,9 @@ void player_die(player plyr);
 /**** player_turn: ****/
 void player_turn(player plyr, int dir);
 
+/**** player_change_speed: ****/
+void player_speed(player plyr, int a);
+
 /**** player_toggle: ****/
 void player_toggle(player plyr);
 

@@ -36,6 +36,8 @@ void arena_render(arena arna);
  */
 int arena_ply_turn(arena arna, int plyr_id, int dir);
 
+int arena_ply_speed(arena arna, int plyr_id, int a);
+
 /**** arena_ply_tg: ****
  * On Entry: player id to toggle 
  * On Exit: toggles between breaking a trail or starting a new one 
