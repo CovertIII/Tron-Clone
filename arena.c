@@ -54,6 +54,16 @@ void arena_update(arena arna, double dt){
 	int i;
 	for(i=0; i<arna->plyr_nm; i++){
 		player_update(arna->actors[i], dt);
+		
+		
+		player_ck_bd(arna->actors[i], arna->bd.x, arna->bd.y);
+		player_ck_self(arna->actors[i]);
+		int k;
+		for(k=0; k<arna->plyr_nm; k++){
+			if(k != i){
+				player_ck_plyr(arna->actors[i], arna->actors[k]);
+			}
+		}
 	}
 }
 

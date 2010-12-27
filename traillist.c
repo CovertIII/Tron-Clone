@@ -50,6 +50,7 @@ void traillist_update(traillist tlist, vector2 p, float dt){
 
 
 	trailnode* trail = tlist->firsttrail;
+	trailnode* prev = NULL;
 
 	if(tlist->trailtoggle){
 		plist_add(&trail->t.draw_trail, p);
@@ -57,16 +58,30 @@ void traillist_update(traillist tlist, vector2 p, float dt){
 			plist_add(&trail->t.col_trail, p);
 			tlist->col_timer = 0;
 		}
-//		trail = trail->next;
 	}	
 
 	/*TODO once you find out that a trail is done,
 	 * free the trailnode and reoranize the list.
 	 * */
 	while(trail != NULL){
-		plist_update(trail->t.draw_trail, dt);
-		plist_update(trail->t.col_trail, dt);
-		trail = trail->next;
+		if(plist_update(trail->t.col_trail, dt)){
+			trail->t.col_trail = NULL;
+		}
+		if(plist_update(trail->t.draw_trail, dt)){
+			if(prev == NULL){
+				tlist->firsttrail = NULL;
+				return;
+			}
+			trail->t.draw_trail = NULL;
+			trailnode* tmp = trail;
+			prev->next = trail->next;
+			trail = trail->next;
+			free(tmp);
+		}
+		else{
+			prev = trail;
+			trail = trail->next;
+		}
 	}
 }
 
@@ -89,8 +104,22 @@ void traillist_render(traillist tlist){
 	trailnode *cycle = tlist->firsttrail;
 	while(cycle != NULL){
 		plist_render(cycle->t.draw_trail);
+		//plist_render(cycle->t.col_trail);
 		cycle = cycle->next;
 	}
+}
+
+int traillist_intersect(traillist tlist, vector2 g1, vector2 g2){
+	if(tlist->firsttrail == NULL){
+		return 0;
+	}
+	trailnode *cycle = tlist->firsttrail;
+	while(cycle != NULL){
+		if(plist_intersect(cycle->t.col_trail, g1, g2))
+			{return 1;}
+		cycle = cycle->next;
+	}
+	return 0;
 }
 
 trailnode* add_trail(void){

@@ -13,8 +13,10 @@ int lastFrameTime = 0;
 int frame=0,time, fps, timebase=0;
 
 vector2 movin = {0,0};
+vector2 movin2 = {0,0};
 vector2 mouse = {0,0};
 int sharp=0;
+int sharp2=0;
 
 arena mygame;
 
@@ -44,7 +46,7 @@ void init()
 
 	
 	
-	mygame = arena_init(1,0, windowWidth, windowHeight);
+	mygame = arena_init(2,0, windowWidth, windowHeight);
 }
 
 void numbers(int value){
@@ -73,6 +75,19 @@ void numbers(int value){
 		{arena_ply_speed(mygame, 0,  500);}
 	else if (movin.y == 0)
 		{arena_ply_speed(mygame, 0, 0);}
+	
+	if (movin2.x == -1)
+		{sharp2 ? arena_ply_turn(mygame, 1, 7) : arena_ply_turn(mygame, 1, 3);}
+	else if (movin2.x == 1)
+		{sharp2 ? arena_ply_turn(mygame, 1, -7) : arena_ply_turn(mygame, 1, -3);}
+	else if (movin2.x == 0)
+		{ arena_ply_turn(mygame, 1, 0);}
+	if (movin2.y == -1)
+		{arena_ply_speed(mygame, 1, -500);}
+	else if (movin2.y == 1)
+		{arena_ply_speed(mygame, 1,  500);}
+	else if (movin2.y == 0)
+		{arena_ply_speed(mygame, 1, 0);}
 	
 	arena_update(mygame, h);
 	glutPostRedisplay();
@@ -114,11 +129,29 @@ void display(void) {
 
 void pressKey(unsigned char key, int xx, int yy) {
 	switch(key) {
-		case 'a':
+		case 'k':
 			sharp = 1;
 			break;
-		case 's':
+		case 'f':
+			sharp2 = 1;
+			break;	
+		case 'l':
 			arena_plyr_tg(mygame, 0);
+			break;
+		case 'q':
+			arena_plyr_tg(mygame, 1);
+			break;
+		case 'w':
+			movin2.y=1;
+			break;
+		case 's':
+			movin2.y=-1;
+			break;
+		case 'a':
+			movin2.x=-1;
+			break;
+		case 'd':
+			movin2.x= 1;
 			break;
 		case 27 :
 			exit(0);
@@ -148,8 +181,27 @@ void SpressKey(int key, int xx, int yy) {
 
 void releaseKey(unsigned char key, int xx, int yy) {
 	switch (key) {
-		case 'a':
+		case 'k':
 			sharp = 0;
+			break;
+		case 'f':
+			sharp2 = 0;
+			break;
+		case 'a':
+			if(movin2.x<0)
+			movin2.x=0;
+			break;
+		case 'd':
+			if(movin2.x>0)
+			movin2.x=0;
+			break;
+		case 'w':
+			if(movin2.y>0)
+			movin2.y=0;
+			break;
+		case 's':
+			if(movin2.y<0)
+			movin2.y=0;
 			break;
 		default:
 			break;

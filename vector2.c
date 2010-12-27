@@ -39,6 +39,9 @@ vector2 v2Polar(float len, float angle) {
 float v2Dot(vector2 a, vector2 b) {
 	return a.x*b.x + a.y*b.y;
 }
+float v2Cross(vector2 a, vector2 b) {
+	return a.x*b.y - a.y*b.x;
+}
 float v2Len(vector2 v) {
 	return sqrt(v.x*v.x + v.y*v.y);
 }

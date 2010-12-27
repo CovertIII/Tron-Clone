@@ -15,6 +15,15 @@ void player_update(player plyr, double dt);
 /**** player_die: ****/
 void player_die(player plyr);
 
+/*** player_ck_bd: ***/
+int player_ck_bd(player plyr, int x, int y);
+
+/*** player_ck_self: ***/
+int player_ck_self(player plyr);
+
+/** player_ck_plyr: ***/
+int player_ck_plyr(player plyr_hd, player plyr_tl);
+
 /**** player_turn: ****/
 void player_turn(player plyr, int dir);
 

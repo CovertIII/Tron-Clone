@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "vector2.h"
 #include "plist.h"
+#include "collison.h"
 
 typedef struct{
 	vector2 p;
@@ -62,15 +63,35 @@ int plist_update(plist list, float dt){
 	return 0;
 }
 
+int plist_intersect(plist list, vector2 g1, vector2 g2){
+	if(list == NULL)
+		{return 0;}
+	pnode *cycle = list->next;
+	if(cycle == NULL)
+		{return 0;}
+	pnode *nxt = cycle->next;
+	
+	while(nxt != NULL){		
+		if(line_collison(g1, g2, nxt->pt.p, cycle->pt.p) && nxt->pt.t > 0.5){
+			return 1;
+		}
+		cycle = cycle->next;
+		nxt = nxt->next;
+	}
+	return 0;
+}
+
+
 void plist_render(plist list){
 	pnode *cycle = list;
-	
+	glPointSize(5);	
 	glPushMatrix();
 	glBegin(GL_LINE_STRIP);
+	//glBegin(GL_POINTS);
 	
 	while(cycle != NULL){
 		if(cycle->pt.t < 1.0f)
-			{glColor4f(1,1,1, cycle->pt.t);}
+			{glColor4f(1,1,1,cycle->pt.t);}
 		else
 			{glColor3f(1,1,1);}
 		
