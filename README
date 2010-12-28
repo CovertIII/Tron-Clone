@@ -1,0 +1,9 @@
+Tron Game
+========
+This is going to be a tron clone.  Before this game, I had just
+learned about memory managment with C.  I made this game to practice
+using memory managment and a little bit of absract data type.  I
+plan on to have it networked.  So in the future there will be a
+server and client.  Right now I am still working on the game logic.
+Mess around with this if you would like to.  It is not really 
+playable now.

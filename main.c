@@ -46,7 +46,7 @@ void init()
 
 	
 	
-	mygame = arena_init(2,0, windowWidth, windowHeight);
+	mygame = arena_init(25,0, windowWidth, windowHeight);
 }
 
 void numbers(int value){
