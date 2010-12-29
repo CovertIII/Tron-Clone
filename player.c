@@ -50,16 +50,21 @@ player player_init(int x, int y, double th){
 	return plyr;
 }
 
+int player_status(player plyr){
+	return plyr->dead;
+}
+
 void player_update(player plyr, double dt){
-	plyr->th += plyr->w*dt;
-	plyr->vel += plyr->a*dt;
-
-	plyr->v.x += (3*plyr->vel * cos(plyr->th) - 3*plyr->v.x)*dt;
-	plyr->v.y += (3*plyr->vel * sin(plyr->th) - 3*plyr->v.y)*dt;
-
-	plyr->p.x += plyr->v.x*dt;
-	plyr->p.y += plyr->v.y*dt;
+	if(plyr->dead == 0){
+		plyr->th += plyr->w*dt;
+		plyr->vel += plyr->a*dt;
 	
+		plyr->v.x += (3*plyr->vel * cos(plyr->th) - 3*plyr->v.x)*dt;
+		plyr->v.y += (3*plyr->vel * sin(plyr->th) - 3*plyr->v.y)*dt;
+	
+		plyr->p.x += plyr->v.x*dt;
+		plyr->p.y += plyr->v.y*dt;
+	}	
 	
 	vector2 tmp = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	
@@ -77,8 +82,6 @@ int player_ck_bd(player plyr, int x, int y){
 
 	if(line_collison(c1, c2, t1, t2) || line_collison(c2, c3, t1, t2) ||
 		line_collison(c3, c4, t1, t2) || line_collison(c4, c1, t1, t2)){
-		plyr->trailtoggle = 0;
-		trail_off(plyr->trails);
 		return 1;
 	}
 	return 0;
@@ -90,8 +93,6 @@ int player_ck_self(player plyr){
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
 	
 	if(traillist_intersect(plyr->trails, t1, t2)){
-		plyr->trailtoggle = 0;
-		trail_off(plyr->trails);
 		return 1;
 	}
 	return 0;
@@ -104,9 +105,7 @@ int player_ck_plyr(player plyr_hd, player plyr_tl){
 	vector2 tl1 = {-plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x, -plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	vector2 tl2 = { plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x,  plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	
-	if(traillist_intersect(plyr_tl->trails, hd1, hd2) || line_collison(hd1, hd2, tl1, tl2)){
-		plyr_hd->trailtoggle = 0;
-		trail_off(plyr_hd->trails);
+	if(traillist_intersect(plyr_tl->trails, hd1, hd2) || (line_collison(hd1, hd2, tl1, tl2) && plyr_tl->dead == 0)){
 		return 1;
 	}
 	return 0;
@@ -130,21 +129,27 @@ void player_toggle(player plyr){
 		plyr->trailtoggle = 0;
 		trail_off(plyr->trails);
 	}
-	else{
+	else if (plyr->trailtoggle == 0 && plyr->dead == 0){
 		plyr->trailtoggle = 1;
 		trail_on(plyr->trails);
+	}
+	else
+	{
+		plyr->trailtoggle = 0;
+		trail_off(plyr->trails);
 	}
 }
 
 void player_render(player plyr){
-	glPushMatrix();
-	glLineWidth(3.0);
+	if(plyr->dead == 0){
+		glPushMatrix();
+		glLineWidth(3.0);
 	
-	glBegin(GL_LINES);
-		glVertex2f(plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y);
-		glVertex2f(-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y);
-	glEnd();
-	
+		glBegin(GL_LINES);
+			glVertex2f(plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y);
+			glVertex2f(-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y);
+		glEnd();
+	}	
 	glLineWidth(2.0);
 	traillist_render(plyr->trails);
 	glPopMatrix();
@@ -152,6 +157,9 @@ void player_render(player plyr){
 
 void player_die(player plyr){
 	plyr->dead = 1;
+	plyr->trailtoggle = 0;
+	trail_off(plyr->trails);
+
 }
 
 void player_free(player plyr){

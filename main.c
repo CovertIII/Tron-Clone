@@ -7,7 +7,10 @@
 
 #define TRUE 1
 #define FALSE 0
+#define GAME 0
+#define LOBBY 1
 #define TIMERMSECS 17
+#define TWIXT_TIME 5.0f
 
 int lastFrameTime = 0;
 int frame=0,time, fps, timebase=0;
@@ -17,6 +20,9 @@ vector2 movin2 = {0,0};
 vector2 mouse = {0,0};
 int sharp=0;
 int sharp2=0;
+float timer = 0;
+int game_state;
+int player_num;
 
 arena mygame;
 
@@ -32,7 +38,7 @@ void renderBitmapString(
 	}
 }
 
-void init()
+void init(int argc, char** argv)
 {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -44,9 +50,12 @@ void init()
 	int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 
-	
-	
-	mygame = arena_init(25,0, windowWidth, windowHeight);
+	if(argc < 2)
+		{player_num = 2;}
+	else
+		{sscanf(argv[1],"%d",&player_num);}
+	game_state = GAME;	
+	mygame = arena_init(player_num,0, windowWidth, windowHeight);
 }
 
 void numbers(int value){
@@ -61,35 +70,55 @@ void numbers(int value){
     float elapsedTime = elapsedMilliseconds / 1000.0f;
     lastFrameTime = now;
 	float h = elapsedTime;
-	
-	
 	if (movin.x == -1)
 		{sharp ? arena_ply_turn(mygame, 0, 7) : arena_ply_turn(mygame, 0, 3);}
-	else if (movin.x == 1)
-		{sharp ? arena_ply_turn(mygame, 0, -7) : arena_ply_turn(mygame, 0, -3);}
-	else if (movin.x == 0)
-		{ arena_ply_turn(mygame, 0, 0);}
-	if (movin.y == -1)
-		{arena_ply_speed(mygame, 0, -500);}
-	else if (movin.y == 1)
-		{arena_ply_speed(mygame, 0,  500);}
-	else if (movin.y == 0)
-		{arena_ply_speed(mygame, 0, 0);}
-	
-	if (movin2.x == -1)
-		{sharp2 ? arena_ply_turn(mygame, 1, 7) : arena_ply_turn(mygame, 1, 3);}
-	else if (movin2.x == 1)
-		{sharp2 ? arena_ply_turn(mygame, 1, -7) : arena_ply_turn(mygame, 1, -3);}
-	else if (movin2.x == 0)
-		{ arena_ply_turn(mygame, 1, 0);}
-	if (movin2.y == -1)
-		{arena_ply_speed(mygame, 1, -500);}
-	else if (movin2.y == 1)
-		{arena_ply_speed(mygame, 1,  500);}
-	else if (movin2.y == 0)
-		{arena_ply_speed(mygame, 1, 0);}
-	
-	arena_update(mygame, h);
+			else if (movin.x == 1)
+				{sharp ? arena_ply_turn(mygame, 0, -7) : arena_ply_turn(mygame, 0, -3);}
+			else if (movin.x == 0)
+				{ arena_ply_turn(mygame, 0, 0);}
+			if (movin.y == -1)
+				{arena_ply_speed(mygame, 0, -500);}
+			else if (movin.y == 1)
+				{arena_ply_speed(mygame, 0,  500);}
+			else if (movin.y == 0)
+				{arena_ply_speed(mygame, 0, 0);}
+			
+			if (movin2.x == -1)
+				{sharp2 ? arena_ply_turn(mygame, 1, 7) : arena_ply_turn(mygame, 1, 3);}
+			else if (movin2.x == 1)
+				{sharp2 ? arena_ply_turn(mygame, 1, -7) : arena_ply_turn(mygame, 1, -3);}
+			else if (movin2.x == 0)
+				{ arena_ply_turn(mygame, 1, 0);}
+			if (movin2.y == -1)
+				{arena_ply_speed(mygame, 1, -500);}
+			else if (movin2.y == 1)
+				{arena_ply_speed(mygame, 1,  500);}
+			else if (movin2.y == 0)
+				{arena_ply_speed(mygame, 1, 0);}
+			
+			arena_update(mygame, h);
+	switch(game_state){
+		case GAME:	
+			
+			if(arena_player_status(mygame) == 1){
+				game_state = LOBBY;
+				timer = 4.99;
+			}
+			break;
+		case LOBBY:
+			timer -= h;
+			if(timer <= 0){
+				arena_free(mygame);
+				mygame = NULL;
+
+				int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
+				int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
+				mygame = arena_init(player_num,0, windowWidth, windowHeight);
+
+				game_state = GAME;
+			}
+			break;
+	}
 	glutPostRedisplay();
 }
 
@@ -121,6 +150,15 @@ void display(void) {
 	renderBitmapString(10, windowHeight-10, GLUT_BITMAP_TIMES_ROMAN_10, buf);
 	glPopMatrix();
 	
+	if(game_state == LOBBY){
+		sprintf(buf, "%.0f", timer+0.5);	
+		glPushMatrix();
+		glLoadIdentity();
+		glColor3f(0, 0, 0);
+		renderBitmapString(windowWidth/2, windowHeight/2, GLUT_BITMAP_TIMES_ROMAN_24, buf);
+		glPopMatrix();
+	}
+
 	arena_render(mygame);
 	
 	glutSwapBuffers();
@@ -269,7 +307,7 @@ int main(int argc, char** argv)
     
     glutCreateWindow("TronClone");
 	
-	init();
+	init(argc, argv);
 	
 	
 	glutMouseFunc(mouseButton);

@@ -28,6 +28,11 @@ void arena_update(arena arna, double dt);
  */
 void arena_render(arena arna);
 
+/**** arena_player_status ***
+ * One Entry: takes an arena
+ * on exit: return the number of players alive in the arena
+ */
+int arena_player_status(arena arna);
 
 /*** arena_ply_trn: *****
  * On Entry: player number that's turning, direction you want player to go

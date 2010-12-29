@@ -15,6 +15,9 @@ void player_update(player plyr, double dt);
 /**** player_die: ****/
 void player_die(player plyr);
 
+/**** player_status (returns 0 if player is alive, and one if he is dead) ***/
+int player_status(player plyr);
+
 /*** player_ck_bd: ***/
 int player_ck_bd(player plyr, int x, int y);
 
