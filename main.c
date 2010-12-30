@@ -100,7 +100,7 @@ void numbers(int value){
 	switch(game_state){
 		case GAME:	
 			
-			if(arena_player_status(mygame) == 1){
+			if(arena_player_status(mygame) <= 1){
 				game_state = LOBBY;
 				timer = 4.99;
 			}

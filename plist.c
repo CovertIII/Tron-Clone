@@ -102,3 +102,12 @@ void plist_render(plist list){
 	glEnd();
 	glPopMatrix();
 }
+
+void plist_free(plist list){
+	pnode *cycle = list;
+	while(cycle != NULL){
+		pnode *tmp = cycle->next;
+		free(cycle);
+		cycle = tmp;
+	}	
+}

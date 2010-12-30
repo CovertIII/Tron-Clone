@@ -73,12 +73,13 @@ void arena_update(arena arna, double dt){
 		
 		int k;
 		for(k=0; k<arna->plyr_nm; k++){
-			if(
-				k != i && 
-				player_ck_plyr(arna->actors[i], arna->actors[k])
-			){
+			if(k != i && player_ck_plyr(arna->actors[i], arna->actors[k]) == 1){
 				player_die(arna->actors[i]);
 			}
+			if(k != i && player_ck_plyr(arna->actors[i], arna->actors[k]) == 2){
+				player_die(arna->actors[i]);
+				player_die(arna->actors[k]);
+			}			
 		}
 	}
 }

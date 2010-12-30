@@ -105,8 +105,11 @@ int player_ck_plyr(player plyr_hd, player plyr_tl){
 	vector2 tl1 = {-plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x, -plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	vector2 tl2 = { plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x,  plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	
-	if(traillist_intersect(plyr_tl->trails, hd1, hd2) || (line_collison(hd1, hd2, tl1, tl2) && plyr_tl->dead == 0)){
+	if(traillist_intersect(plyr_tl->trails, hd1, hd2) ){
 		return 1;
+	}
+	if(line_collison(hd1, hd2, tl1, tl2) && plyr_tl->dead == 0 && plyr_hd->dead == 0){
+		return 2;
 	}
 	return 0;
 }
@@ -163,5 +166,6 @@ void player_die(player plyr){
 }
 
 void player_free(player plyr){
+	trail_free(plyr->trails);
 	free(plyr);
 }

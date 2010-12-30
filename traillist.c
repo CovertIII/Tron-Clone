@@ -103,8 +103,8 @@ void trail_off(traillist tlist){
 void traillist_render(traillist tlist){
 	trailnode *cycle = tlist->firsttrail;
 	while(cycle != NULL){
-		plist_render(cycle->t.draw_trail);
-		//plist_render(cycle->t.col_trail);
+		//plist_render(cycle->t.draw_trail);
+		plist_render(cycle->t.col_trail);
 		cycle = cycle->next;
 	}
 }
@@ -133,4 +133,20 @@ trailnode* add_trail(void){
 	trail->next = NULL;
 	
 	return trail;
+}
+
+void trail_free(traillist tlist){
+	trailnode *cycle = tlist->firsttrail;
+	while(cycle != NULL){
+		plist_free(cycle->t.col_trail);
+		plist_free(cycle->t.draw_trail);
+		cycle = cycle->next;
+	}
+
+	cycle = tlist->firsttrail;
+	while(cycle != NULL){
+		trailnode *tmp = cycle->next;
+		free(cycle);
+		cycle = tmp;
+	}
 }
