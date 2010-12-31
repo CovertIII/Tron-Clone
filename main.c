@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <GLUT/glut.h>
-#include "arena.h"
 #include "vector2.h"
+#include "arena.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -150,6 +150,8 @@ void display(void) {
 	renderBitmapString(10, windowHeight-10, GLUT_BITMAP_TIMES_ROMAN_10, buf);
 	glPopMatrix();
 	
+	arena_render(mygame);
+
 	if(game_state == LOBBY){
 		sprintf(buf, "%.0f", timer+0.5);	
 		glPushMatrix();
@@ -159,8 +161,7 @@ void display(void) {
 		glPopMatrix();
 	}
 
-	arena_render(mygame);
-	
+		
 	glutSwapBuffers();
 	glFlush();
 }

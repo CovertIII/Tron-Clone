@@ -103,20 +103,21 @@ void trail_off(traillist tlist){
 void traillist_render(traillist tlist){
 	trailnode *cycle = tlist->firsttrail;
 	while(cycle != NULL){
-		//plist_render(cycle->t.draw_trail);
-		plist_render(cycle->t.col_trail);
+		plist_render(cycle->t.draw_trail);
+		//plist_render(cycle->t.col_trail);
 		cycle = cycle->next;
 	}
 }
 
-int traillist_intersect(traillist tlist, vector2 g1, vector2 g2){
+int traillist_intersect(traillist tlist, vector2 g1, vector2 g2, int line1){
 	if(tlist->firsttrail == NULL){
 		return 0;
 	}
 	trailnode *cycle = tlist->firsttrail;
 	while(cycle != NULL){
-		if(plist_intersect(cycle->t.col_trail, g1, g2))
+		if(plist_intersect(cycle->t.col_trail, g1, g2, line1))
 			{return 1;}
+		line1 = 0;
 		cycle = cycle->next;
 	}
 	return 0;

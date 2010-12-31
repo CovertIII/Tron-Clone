@@ -33,7 +33,9 @@ arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd){
 	
 	int i;
 	for(i=0; i<plyr_nm; i++){
+
 		float dir = 2*M_PI*(float)i/((float)plyr_nm);
+
 		arna->actors[i] = player_init((x_bd/2.0f-20)*cos(dir)+x_bd/2.0f,(y_bd/2.0f-20)*sin(dir)+y_bd/2.0f, dir+M_PI);
 		if(arna->actors[i]==NULL){
 			/*free the other data*/
@@ -87,7 +89,8 @@ void arena_update(arena arna, double dt){
 void arena_render(arena arna){
 	int i;
 	for (i=0; i < arna->plyr_nm; i++){
-		glColor3f((float)i/(float)arna->plyr_nm, 0.5, (float)i/(float)arna->plyr_nm);
+
+		glColor3f((float)i/(float)arna->plyr_nm,0.5,(float)i/(float)arna->plyr_nm);
 		player_render(arna->actors[i]);
 	}
 }

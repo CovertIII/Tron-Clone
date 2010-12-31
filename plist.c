@@ -63,10 +63,10 @@ int plist_update(plist list, float dt){
 	return 0;
 }
 
-int plist_intersect(plist list, vector2 g1, vector2 g2){
+int plist_intersect(plist list, vector2 g1, vector2 g2, int line1){
 	if(list == NULL)
 		{return 0;}
-	pnode *cycle = list->next;
+	pnode *cycle = (line1)?(list->next):(list);
 	if(cycle == NULL)
 		{return 0;}
 	pnode *nxt = cycle->next;
@@ -84,16 +84,19 @@ int plist_intersect(plist list, vector2 g1, vector2 g2){
 
 void plist_render(plist list){
 	pnode *cycle = list;
+	float c[4];
+	glGetFloatv(GL_CURRENT_COLOR, &c); 
 	glPointSize(5);	
+
 	glPushMatrix();
 	glBegin(GL_LINE_STRIP);
 	//glBegin(GL_POINTS);
 	
 	while(cycle != NULL){
 		if(cycle->pt.t < 1.0f)
-			{glColor4f(1,1,1,cycle->pt.t);}
+			{glColor4f(c[0]+0.25,c[1]+0.25,c[2]+0.25,cycle->pt.t);}
 		else
-			{glColor3f(1,1,1);}
+			{glColor3f(c[0]+0.25,c[1]+0.25,c[2]+0.25);}
 		
 		glVertex2f(cycle->pt.p.x, cycle->pt.p.y);
 		cycle = cycle->next;
@@ -101,6 +104,7 @@ void plist_render(plist list){
 		
 	glEnd();
 	glPopMatrix();
+	glColor3f(c[0],c[1],c[2]);
 }
 
 void plist_free(plist list){

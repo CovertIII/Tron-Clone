@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "player.h"
 #include "vector2.h"
+#include "player.h"
 #include "math.h"
 #include "traillist.h"
 #include "collison.h"
@@ -92,7 +92,7 @@ int player_ck_self(player plyr){
 	vector2 t1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
 	
-	if(traillist_intersect(plyr->trails, t1, t2)){
+	if(traillist_intersect(plyr->trails, t1, t2, 1)){
 		return 1;
 	}
 	return 0;
@@ -105,7 +105,7 @@ int player_ck_plyr(player plyr_hd, player plyr_tl){
 	vector2 tl1 = {-plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x, -plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	vector2 tl2 = { plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x,  plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	
-	if(traillist_intersect(plyr_tl->trails, hd1, hd2) ){
+	if(traillist_intersect(plyr_tl->trails, hd1, hd2, 0)){
 		return 1;
 	}
 	if(line_collison(hd1, hd2, tl1, tl2) && plyr_tl->dead == 0 && plyr_hd->dead == 0){
@@ -153,6 +153,7 @@ void player_render(player plyr){
 			glVertex2f(-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y);
 		glEnd();
 	}	
+
 	glLineWidth(2.0);
 	traillist_render(plyr->trails);
 	glPopMatrix();
