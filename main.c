@@ -130,7 +130,7 @@ void display(void) {
 	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 	
 	//-----This is the stuff involved with drawing the screen----//	
-	glClearColor (0.8, 0.8,0.8,0);
+	glClearColor (0.9,0.9,0.9,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	frame++;

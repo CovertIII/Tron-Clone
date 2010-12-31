@@ -7,6 +7,7 @@
 #include "math.h"
 #include "traillist.h"
 #include "collison.h"
+#include "particle_sys.h"
 
 #define VELOCITY 100
 #define MIN_VEL 75
@@ -24,6 +25,7 @@ typedef struct playertype {
 	int trailtoggle;	
 	int dead;
 	traillist trails;	
+	particles ghost;
 } playertype;
 
 player player_init(int x, int y, double th){
@@ -44,6 +46,7 @@ player player_init(int x, int y, double th){
 	plyr->length = LENGTH;
 	
 	plyr->dead = 0;
+	plyr-> ghost = NULL;
 	plyr->trailtoggle = 1;
 	plyr->trails = traillist_init();	
 	
@@ -65,6 +68,8 @@ void player_update(player plyr, double dt){
 		plyr->p.x += plyr->v.x*dt;
 		plyr->p.y += plyr->v.y*dt;
 	}	
+
+	particles_update(plyr->ghost, dt);
 	
 	vector2 tmp = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	
@@ -144,6 +149,7 @@ void player_toggle(player plyr){
 }
 
 void player_render(player plyr){
+	particles_render(plyr->ghost);
 	if(plyr->dead == 0){
 		glPushMatrix();
 		glLineWidth(3.0);
@@ -160,13 +166,19 @@ void player_render(player plyr){
 }
 
 void player_die(player plyr){
+	if(plyr->dead)
+		{return;}
 	plyr->dead = 1;
 	plyr->trailtoggle = 0;
 	trail_off(plyr->trails);
+	vector2 tmp1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
+	vector2 tmp2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
 
+	plyr->ghost = particles_init(tmp1, tmp2, plyr->v);
 }
 
 void player_free(player plyr){
+	particles_free(plyr->ghost);
 	trail_free(plyr->trails);
 	free(plyr);
 }

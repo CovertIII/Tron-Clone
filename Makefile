@@ -1,6 +1,6 @@
 CFLAGS=-g
 PROGRAMS=tron
-LIBS=vector2.o collison.o plist.o traillist.o player.o arena.o
+LIBS=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
 
 CC=gcc
 
@@ -13,6 +13,9 @@ main.o:	main.c arena.h
 vector2.o: vector2.c vector2.h
 	$(CC) $(CFLAGS) -c vector2.c
 
+particle_sys.o: particle_sys.c particle_sys.h vector2.h
+	$(CC) $(CFLAGS) -c particle_sys.c
+
 collison.o: collison.c collison.h vector2.h
 	$(CC) $(CFLAGS) -c collison.c
 
@@ -22,7 +25,7 @@ plist.o: plist.c plist.h collison.h vector2.h
 traillist.o: traillist.c traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c traillist.c
 
-player.o: player.c player.h traillist.h plist.h collison.h vector2.h
+player.o: player.c player.h traillist.h particle_sys.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c player.c
 
 arena.o: arena.c arena.h traillist.h plist.h collison.h vector2.h
