@@ -90,7 +90,7 @@ void arena_render(arena arna){
 	int i;
 	for (i=0; i < arna->plyr_nm; i++){
 
-		glColor3f((float)i/(float)arna->plyr_nm,0.5,(float)i/(float)arna->plyr_nm);
+		glColor3f((float)i/(float)arna->plyr_nm,0.2,1-(float)i/(float)arna->plyr_nm);
 		player_render(arna->actors[i]);
 	}
 }

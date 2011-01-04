@@ -24,6 +24,13 @@ vector2 v2Unit(vector2 v) {
 	a.y = v.y/v2Len(v);
 	return a;
 }
+vector2 v2Rotate(float ang, vector2 a){
+	vector2 r;
+	r.x = a.x*cos(ang) - a.y*sin(ang);
+	r.y = a.x*sin(ang) + a.y*cos(ang);
+	return r;
+
+}
 vector2 v2sMul(float f, vector2 v) {
 	v.x = f*v.x;
 	v.y = f*v.y;

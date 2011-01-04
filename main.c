@@ -130,7 +130,7 @@ void display(void) {
 	int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
 	
 	//-----This is the stuff involved with drawing the screen----//	
-	glClearColor (0.9,0.9,0.9,0);
+	glClearColor (0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	frame++;
@@ -156,7 +156,7 @@ void display(void) {
 		sprintf(buf, "%.0f", timer+0.5);	
 		glPushMatrix();
 		glLoadIdentity();
-		glColor3f(0, 0, 0);
+		glColor3f(0.5, 0.5, 0.5);
 		renderBitmapString(windowWidth/2, windowHeight/2, GLUT_BITMAP_TIMES_ROMAN_24, buf);
 		glPopMatrix();
 	}
@@ -168,13 +168,13 @@ void display(void) {
 
 void pressKey(unsigned char key, int xx, int yy) {
 	switch(key) {
-		case 'k':
+		case ',':
 			sharp = 1;
 			break;
-		case 'f':
+		case ' ':
 			sharp2 = 1;
 			break;	
-		case 'l':
+		case 'm':
 			arena_plyr_tg(mygame, 0);
 			break;
 		case 'q':
@@ -220,10 +220,10 @@ void SpressKey(int key, int xx, int yy) {
 
 void releaseKey(unsigned char key, int xx, int yy) {
 	switch (key) {
-		case 'k':
+		case ',':
 			sharp = 0;
 			break;
-		case 'f':
+		case ' ':
 			sharp2 = 0;
 			break;
 		case 'a':

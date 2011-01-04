@@ -34,7 +34,7 @@ particles particles_init(vector2 pt1, vector2 pt2, vector2 v){
 		cycle->p.p = v2Add(pt2, v2sMul(i,v2Unit(v2Sub(pt1, pt2))));
 		vector2 rv = {rand()%50-25, rand()%50-25};
 		cycle->p.v = v2Add(v, rv);
-		cycle->p.t = 2+rand()%2;
+		cycle->p.t = 2+(float)(rand()%11)/10.0f;
 		cycle->next = NULL;
 		prev = cycle;
 	}

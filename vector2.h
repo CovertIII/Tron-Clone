@@ -8,6 +8,7 @@ vector2 v2Neg(vector2 a);
 vector2 v2Unit(vector2 v);
 vector2 v2sMul(float f, vector2 v);
 vector2 v2Polar(float len, float angle);
+vector2 v2Rotate(float ang, vector2 a);
 
 float v2Dot(vector2 a, vector2 b);
 float v2Cross(vector2 a, vector2 b); 
