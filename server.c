@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <enet.h>
+#include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
+#include "user.h"
 #include "server.h"
 
 #define LOBBY 0
@@ -10,11 +11,11 @@
 #define GAME 2
 #define POSTGAME 3
 
-typedef struct {
+typedef struct servertype{
 	int game_state;
 	arena s_game;
 	//chat s_chat;
-	users s_users;
+	user s_users;
 	double timer;
 } servertype;
 
@@ -22,8 +23,8 @@ server server_init(void){
 	server svr;
 	svr = (server)malloc(sizeof(servertype));
 	svr->game_state = LOBBY;
-	svr->s_user = user_init(void); 
-	svr->s_chat = chat_init(void);
+	svr->s_users = user_init(); 
+	//svr->s_chat = chat_init();
 	return svr;
 }
 
@@ -31,14 +32,14 @@ server server_init(void){
  * Also send the state of the server and or arena to the newly connected client
  */
 void server_add_user(server svr, ENetPeer *peer){
-	switch(svr->game_date){
+	switch(svr->game_state){
 		case LOBBY:
-			user_add(svr->s_user, peer, NOT_READY);
+			user_add(svr->s_users, peer, NOT_READY);
 			break;
 		case PREGAME:
 		case GAME:
 		case POSTGAME:
-			user_add(svr->s_user, peer, WAITING);
+			user_add(svr->s_users, peer, WAITING);
 			break;
 	}
 	/* TODO: Send information to the new client about the world:
@@ -50,15 +51,16 @@ void server_add_user(server svr, ENetPeer *peer){
 }
 
 void server_remove_user(server svr, ENetPeer *peer){ 
+	int id;
 	switch(svr->game_state){
 		case LOBBY:
-			user_remove(svr->s_user, peer);
+			user_remove(svr->s_users, peer);
 			break;
 		case PREGAME:
 		case GAME:
 		case POSTGAME:
-			int id = user_remove(svr->s_user, peer);
-			arena_kill_player(svr->s_game, id);
+			id = user_remove(svr->s_users, peer);
+			//arena_kill_player(svr->s_game, id);
 			break;
 	}
 	//TODO: send somethign to let clients know a user has disconnected
@@ -66,13 +68,14 @@ void server_remove_user(server svr, ENetPeer *peer){
 void server_update(server svr, double dt){
 	switch(svr->game_state){
 		case LOBBY:
-			if(svr->s_user != NULL && user_number(svr->user) > 0 && user_check_state(svr->s_user) == 0){
+			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){
 				svr->game_state = PREGAME;
 				svr->timer = 5.0f;
-				int ply_num = user_set_arena_id(svr->s_user);
+				int ply_num = user_set_arena_id(svr->s_users);
 				svr->s_game = arena_init(ply_num, 0, 800, 600);
 				//TODO:  Maybe let the client know that we are switching to the pregame state
 				//       and to set its timer to the server pregame timer.
+				//       tell the client to init an arena with the ply_num (AI currently not implemented)
 			}
 			break;
 		case PREGAME:
@@ -84,8 +87,9 @@ void server_update(server svr, double dt){
 			break;
 		case GAME:
 			arena_update(svr->s_game, dt);
-			if(arean_player_status(svr->game_state) <= 1){
-				int winner_id = arena_winner(svr->s_game);
+			//TODO: send the game updates here. (if someone dies send that info, put don't send the particle system)
+			if(arena_player_status(svr->s_game) <= 1){
+				int winner_id; //= arena_winner(svr->s_game);
 				user_update_score(svr->s_users, winner_id, 1);
 				svr->game_state = POSTGAME;
 				svr->timer = 2.0f;
@@ -94,15 +98,18 @@ void server_update(server svr, double dt){
 			break;
 		case POSTGAME:
 			arena_update(svr->s_game, dt);
+			//TODO: send game updates here as well.
 			svr->timer -= dt;
 			if(svr->timer < 0){
 				arena_free(svr->s_game);
 				svr->game_state = LOBBY;
+				user_all_not_ready(svr->s_users);
 				//TODO: Let clients know that we are in the lobby now.
+				//TODO: send all user data to clients to ensure the games are in snyc.
 			}
+			break;
 	}
+}
 
 
-void server_send_updates(server svr);
-
-void server_process_packet(server svr, char *message);
+//void server_process_packet(server svr, char *message);

@@ -1,11 +1,24 @@
 CFLAGS=-g
+MACFLAGS=-framework GLUT -framework OpenGL 
+LINUXFLAGS=-lGL -GLU -lglut
+COCOA=-framework Cocoa
+NETLIBS=-lENet
 PROGRAMS=tron
-LIBS=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
+GAMEOBJ=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
+NETWORK=user.o server.o
 
 CC=gcc
 
-tron: main.o $(LIBS)
-	$(CC) $(CFLAGS) -framework GLUT -framework OpenGL -framework Cocoa main.o $(LIBS) -o tron
+all: tron tserver
+
+tserver: main_server.o $(NETWORK) $(GAMEOBJ)
+	$(CC) $(CFLAGS) $(NETLIBS) $(MACFLAGS) main_server.o $(NETWORK) $(GAMEOBJ) -o tserver
+
+main_server.o: main_server.c server.h
+	$(CC) $(CFLAGS) -c main_server.c
+
+tron: main.o $(GAMEOBJ)
+	$(CC) $(CFLAGS) $(MACFLAGS) $(COCOA) main.o $(GAMEOBJ) -o tron
 
 main.o:	main.c arena.h
 	$(CC) $(CFLAGS) -c main.c
@@ -30,6 +43,12 @@ player.o: player.c player.h traillist.h particle_sys.h plist.h collison.h vector
 
 arena.o: arena.c arena.h traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c arena.c
+
+user.o: user.c user.h
+	$(CC) $(CFLAGS) $(NETLIBS) -c user.c
+
+server.o: server.c server.h user.h arena.h
+	$(CC) $(CFLAGS) $(NETLIBS) -c server.c
 
 clean:
 	\rm *.o

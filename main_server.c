@@ -7,7 +7,7 @@
 
 ENetAddress address;
 ENetEvent event;
-ENetHost * server;
+ENetHost * enetserver;
 
 unsigned long int now;
 unsigned long int prev;
@@ -31,12 +31,12 @@ int main (int argc, char ** argv){
 	address.host = ENET_HOST_ANY;
 	address.port = 5001;
 	
-	server = enet_host_create (& address /* the address to bind the server host to */, 
+	enetserver = enet_host_create (& address /* the address to bind the server host to */, 
 							   32      /* allow up to 32 clients and/or outgoing connections */,
 							   2      /* allow up to 2 channels to be used, 0 and 1 */,
 							   0      /* assume any amount of incoming bandwidth */,
 							   0      /* assume any amount of outgoing bandwidth */);
-	if (server == NULL){
+	if (enetserver== NULL){
 		fprintf (stderr, 
                  "An error occurred while trying to create an ENet server host.\n");
 		exit (EXIT_FAILURE);
@@ -47,7 +47,7 @@ int main (int argc, char ** argv){
     /* Main game loop */
 	while(1){
 		int i, index, temp;
-		if (enet_host_service (server, & event, 10) > 0){
+		if (enet_host_service (enetserver, & event, 10) > 0){
 			switch (event.type){
     		    case ENET_EVENT_TYPE_CONNECT:
     		    	printf ("A new client connected from %x: %u.\n", 
@@ -57,7 +57,7 @@ int main (int argc, char ** argv){
     		      break;
     		
     		    case ENET_EVENT_TYPE_RECEIVE:
-					server_process_packet(tronserver, event.packet->data);
+					//server_process_packet(tronserver, event.packet->data);
 					enet_packet_destroy (event.packet);
     		    	break;
     		
@@ -76,11 +76,9 @@ int main (int argc, char ** argv){
 		double h = (now-prev)/1000000.0f;
 		server_update(tronserver, h);
 		prev = now;
-		
-		server_send_updates(server svr);
 	}
  
-	enet_host_destroy(server);
+	enet_host_destroy(enetserver);
 }
 
 unsigned long int getthetime()
