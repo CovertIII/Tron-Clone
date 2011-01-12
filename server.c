@@ -4,6 +4,7 @@
 #include "vector2.h"
 #include "arena.h"
 #include "user.h"
+#include "chat.h"
 #include "server.h"
 
 #define LOBBY 0
@@ -14,7 +15,7 @@
 typedef struct servertype{
 	int game_state;
 	arena s_game;
-	//chat s_chat;
+	chat s_chat;
 	user s_users;
 	double timer;
 } servertype;
@@ -112,4 +113,6 @@ void server_update(server svr, double dt){
 }
 
 
-//void server_process_packet(server svr, char *message);
+void server_process_packet(server svr, ENetEvent * event){
+	
+}

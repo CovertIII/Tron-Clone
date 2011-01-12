@@ -57,7 +57,7 @@ int main (int argc, char ** argv){
     		      break;
     		
     		    case ENET_EVENT_TYPE_RECEIVE:
-					//server_process_packet(tronserver, event.packet->data);
+					server_process_packet(tronserver, &event);
 					enet_packet_destroy (event.packet);
     		    	break;
     		

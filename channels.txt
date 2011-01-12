@@ -1,0 +1,6 @@
+0 messages
+1 change names
+2 send userinfo on connect
+4 send game state changes
+5 
+6

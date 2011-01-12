@@ -13,5 +13,5 @@ void server_update(server svr, double dt);
 
 void server_send_updates(server svr);
 
-void server_process_packet(server svr, char *message);
+void server_process_packet(server svr, ENetEvent * event);
 

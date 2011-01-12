@@ -5,7 +5,7 @@ COCOA=-framework Cocoa
 NETLIBS=-lENet
 PROGRAMS=tron
 GAMEOBJ=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
-NETWORK=user.o server.o
+NETWORK=user.o server.o chat.o
 
 CC=gcc
 
@@ -43,6 +43,9 @@ player.o: player.c player.h traillist.h particle_sys.h plist.h collison.h vector
 
 arena.o: arena.c arena.h traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c arena.c
+
+chat.o: chat.c chat.h
+	$(CC) $(CFLAGS) -c chat.c
 
 user.o: user.c user.h
 	$(CC) $(CFLAGS) $(NETLIBS) -c user.c
