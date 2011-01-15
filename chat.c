@@ -69,7 +69,7 @@ int chat_add_message(chat cht, char *name, char *message){
 }
 
 void chat_render(chat cht, int type){
-	int i;
+	int i=0;
 	chat_node *cycle = cht->head;
 	
 	while(cycle != NULL){

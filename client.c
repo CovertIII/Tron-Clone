@@ -277,6 +277,9 @@ static void not_connected_keys(client clnt, unsigned key){
 			clnt->mbuf[1] = '\0';
 		}
 	}
+	if (key == 27){
+		exit(0);
+	}
 }
 
 static void renderBitmapString(
