@@ -20,7 +20,7 @@ typedef struct chattype {
 	int m_num; //number of messages;
 } chattype;
 
-void renderBitmapString(
+static void renderBitmapString(
 						float x, 
 						float y, 
 						void *font,
@@ -78,7 +78,6 @@ void chat_render(chat cht, int type){
 		sprintf(buf, "%s: %s", cycle->cd.name, cycle->cd.message);	
 		glPushMatrix();
 		glLoadIdentity();
-		glColor3f(0, 1, 1);
 		renderBitmapString(10, 10 + 12*i, GLUT_BITMAP_TIMES_ROMAN_10, buf);
 		glPopMatrix();
 
@@ -100,7 +99,7 @@ void chat_free(chat cht){
 	free(cht);
 }
 
-void renderBitmapString(
+static void renderBitmapString(
 						float x, 
 						float y, 
 						void *font,

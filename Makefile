@@ -5,17 +5,23 @@ COCOA=-framework Cocoa
 NETLIBS=-lENet
 PROGRAMS=tron
 GAMEOBJ=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
-NETWORK=user.o server.o chat.o
+NETWORK=user.o chat.o server.o client.o
 
 CC=gcc
 
-all: tron tserver
+all: tron tserver tclient
 
 tserver: main_server.o $(NETWORK) $(GAMEOBJ)
 	$(CC) $(CFLAGS) $(NETLIBS) $(MACFLAGS) main_server.o $(NETWORK) $(GAMEOBJ) -o tserver
 
 main_server.o: main_server.c server.h
 	$(CC) $(CFLAGS) -c main_server.c
+
+tclient: main_client.o $(NETWORK) $(GAMEOBJ)
+	$(CC) $(CFLAGS) $(NETLIBS) $(MACFLAGS) main_client.o $(NETWORK) $(GAMEOBJ) -o tclient 
+
+main_client.o: main_client.c client.h vector2.h
+	$(CC) $(CFLAGS) -c main_client.c
 
 tron: main.o $(GAMEOBJ)
 	$(CC) $(CFLAGS) $(MACFLAGS) $(COCOA) main.o $(GAMEOBJ) -o tron
@@ -50,8 +56,12 @@ chat.o: chat.c chat.h
 user.o: user.c user.h
 	$(CC) $(CFLAGS) $(NETLIBS) -c user.c
 
-server.o: server.c server.h user.h arena.h
+server.o: server.c server.h user.h chat.h arena.h
 	$(CC) $(CFLAGS) $(NETLIBS) -c server.c
+
+client.o: client.c client.h user.h chat.h arena.h
+	$(CC) $(CFLAGS) $(NETLIBS) -c client.c
 
 clean:
 	\rm *.o
+	
