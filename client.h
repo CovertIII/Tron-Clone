@@ -12,6 +12,6 @@ void client_render(client clnt);
 
 void client_keys(client clnt, unsigned char key);
 
-void client_process_packets(ENetEvent * event);
+void client_process_packets(client clnt, ENetEvent * event);
 
 void client_free(client clnt);

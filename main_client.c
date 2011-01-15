@@ -59,6 +59,7 @@ void numbers(void){
 	    switch (event.type)
 	    {
 	    	case ENET_EVENT_TYPE_RECEIVE:
+				client_process_packets(tclient, &event);
 	    		break;
     
 	    	case ENET_EVENT_TYPE_DISCONNECT:
@@ -72,7 +73,7 @@ void display(void) {
 	int i,k;
 	numbers();
 	//-----This is the stuff involved with drawing the screen----//	
-	glClearColor (0.8, 0.8,0.8,0);
+	glClearColor (0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	client_render(tclient);	

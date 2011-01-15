@@ -26,7 +26,6 @@ int main (int argc, char ** argv){
 
 	atexit (enet_deinitialize);
 	
-	tronserver = server_init();
 
 	address.host = ENET_HOST_ANY;
 	address.port = 5001;
@@ -41,6 +40,8 @@ int main (int argc, char ** argv){
                  "An error occurred while trying to create an ENet server host.\n");
 		exit (EXIT_FAILURE);
 	}
+
+	tronserver = server_init(enetserver);
 	
 	printf("This is the TronClone Server.\nPush ^c to kill the server.\n");
 
@@ -57,7 +58,7 @@ int main (int argc, char ** argv){
     		      break;
     		
     		    case ENET_EVENT_TYPE_RECEIVE:
-					server_process_packet(tronserver, &event);
+					server_process_packet(tronserver, event);
 					enet_packet_destroy (event.packet);
     		    	break;
     		

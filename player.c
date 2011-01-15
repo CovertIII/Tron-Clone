@@ -160,7 +160,7 @@ void player_render(player plyr){
 		glEnd();
 	}	
 
-	glLineWidth(2.0);
+	glLineWidth(1.5);
 	traillist_render(plyr->trails);
 	glPopMatrix();
 }

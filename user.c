@@ -6,6 +6,7 @@
 typedef struct{
 	char name[80];
 	int arena_plyr_id;
+	int id;
 	ENetPeer *peer;
 	int status;
 	int score;
@@ -39,6 +40,7 @@ int user_add(user usr, ENetPeer *peer, int status){
 	user->ui.peer = peer;
 	user->ui.status = status;
 	user->ui.score = 0;
+	user->ui.id = usr->user_num;
 	user->next = NULL;
 	usr->user_num++;
 	if(usr->head == NULL){
@@ -53,7 +55,10 @@ int user_remove(user usr, ENetPeer *peer){
 	usernode *cycle = usr->head;
 	usernode *prev = NULL;
 	int id;
-	while(cycle->ui.peer != peer || cycle != NULL){
+	if(cycle == NULL){return -1;}
+	while(cycle != NULL){
+		if(cycle->ui.peer == peer)
+			 {break;}	
 		prev = cycle;
 		cycle = cycle->next;
 	}

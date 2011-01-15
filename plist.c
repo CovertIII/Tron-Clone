@@ -86,31 +86,6 @@ void plist_render(plist list){
 	pnode *cycle = list;
 	float c[4];
 	glGetFloatv(GL_CURRENT_COLOR, &c); 
-	glPointSize(5);	
-	glColor4f(c[0],c[1],c[2], 0.3);
-//	glLineWidth(10);
-//	glPushMatrix();
-//	glBegin(GL_LINE_STRIP);
-//	
-//	while(cycle != NULL){
-//		glVertex2f(cycle->pt.p.x, cycle->pt.p.y);
-//		cycle = cycle->next;
-//	}
-//		
-//	glEnd();
-//	glPopMatrix();
-	/*glBegin(GL_QUAD_STRIP);
-	while(cycle->next->next != NULL){
-			vector2 perp1 = v2Add(cycle->pt.p, v2sMul(10,v2Rotate(M_PI_2, v2Unit(v2Sub(cycle->pt.p, cycle->next->pt.p)))));
-			vector2 perp2 = v2Add(cycle->pt.p, v2sMul(10,v2Rotate(-M_PI_2, v2Unit(v2Sub(cycle->pt.p, cycle->next->pt.p)))));
-			glVertex2f(perp1.x, perp1.y);
-			glVertex2f(perp2.x, perp2.y);
-			cycle=cycle->next;
-	}
-	glEnd();
-	*/
-	glLineWidth(1);
-	cycle = list;
 	glPushMatrix();
 	glBegin(GL_LINE_STRIP);
 	

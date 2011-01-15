@@ -14,18 +14,20 @@
 
 typedef struct servertype{
 	int game_state;
+	ENetHost * enet_server;
 	arena s_game;
 	chat s_chat;
 	user s_users;
 	double timer;
 } servertype;
 
-server server_init(void){
+server server_init(ENetHost * enet_server){
 	server svr;
 	svr = (server)malloc(sizeof(servertype));
 	svr->game_state = LOBBY;
 	svr->s_users = user_init(); 
-	//svr->s_chat = chat_init();
+	svr->enet_server = enet_server;
+	svr->s_chat = chat_init();
 	return svr;
 }
 
@@ -61,7 +63,6 @@ void server_remove_user(server svr, ENetPeer *peer){
 		case GAME:
 		case POSTGAME:
 			id = user_remove(svr->s_users, peer);
-			//arena_kill_player(svr->s_game, id);
 			break;
 	}
 	//TODO: send somethign to let clients know a user has disconnected
@@ -113,6 +114,14 @@ void server_update(server svr, double dt){
 }
 
 
-void server_process_packet(server svr, ENetEvent * event){
-	
+void server_process_packet(server svr, ENetEvent event){
+	ENetPacket * packet;
+	switch(event.channelID){
+			case 0:
+				packet = enet_packet_create (event.packet->data, strlen (event.packet->data) + 1, ENET_PACKET_FLAG_RELIABLE);
+				enet_host_broadcast (svr->enet_server, 0, packet);
+				break;
+			case 1:
+				break;
+	}
 }

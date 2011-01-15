@@ -78,7 +78,7 @@ void chat_render(chat cht, int type){
 		sprintf(buf, "%s: %s", cycle->cd.name, cycle->cd.message);	
 		glPushMatrix();
 		glLoadIdentity();
-		renderBitmapString(10, 10 + 12*i, GLUT_BITMAP_TIMES_ROMAN_10, buf);
+		renderBitmapString(10, 10 + 12*i, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();
 
 		cycle = cycle->next;
