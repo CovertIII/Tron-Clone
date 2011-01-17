@@ -26,7 +26,7 @@ int init_network(void){
 
 	enet_client = enet_host_create (NULL /* create a client host */,
 							   1 /* only allow 1 outgoing connection */,
-							   4 /* allow up 4 channels to be used, 0 and 1 */,
+							   10/* allow up 4 channels to be used, 0 and 1 */,
 							   57600 / 8 /* 56K modem with 56 Kbps downstream bandwidth */,
 							   14400 / 8 /* 56K modem with 14 Kbps upstream bandwidth */);
    

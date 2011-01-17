@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <enet/enet.h>
 #include "vector2.h"
@@ -45,6 +46,8 @@ void server_add_user(server svr, ENetPeer *peer){
 			user_add(svr->s_users, peer, WAITING);
 			break;
 	}
+	user_send_list(svr->s_users, peer, 1);
+	user_send_new_client(svr->s_users, peer, svr->enet_server, 2);
 	/* TODO: Send information to the new client about the world:
 	 *         o list of the users including himself
 	 *         o state of the server
@@ -55,19 +58,12 @@ void server_add_user(server svr, ENetPeer *peer){
 
 void server_remove_user(server svr, ENetPeer *peer){ 
 	int id;
-	switch(svr->game_state){
-		case LOBBY:
-			user_remove(svr->s_users, peer);
-			break;
-		case PREGAME:
-		case GAME:
-		case POSTGAME:
-			id = user_remove(svr->s_users, peer);
-			break;
-	}
-	//TODO: send somethign to let clients know a user has disconnected
+	id = user_remove(svr->s_users, peer);
+	//lets other users know who disconnected
+	user_send_disconnect(id, 3, svr->enet_server);
 }
 void server_update(server svr, double dt){
+	printf("GS: %d\n", svr->game_state);
 	switch(svr->game_state){
 		case LOBBY:
 			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){

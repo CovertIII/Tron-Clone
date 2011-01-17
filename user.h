@@ -5,6 +5,7 @@
 
 typedef struct usertype *user;
 
+//General Managment of the list
 /*user_init
  * Entry: Nothing
  * Exit: gives address of user
@@ -19,6 +20,23 @@ user user_init(void);
  *       set the user's score to zero
  */
 int user_add(user usr, ENetPeer *peer, int status);
+
+/* user_remove:
+ * entry: takes the user list,
+ *        takes the enet_peet to remove
+ * exit:  removes the user from the list
+ *        returns his assigned arena id to kill him
+ */
+int user_remove(user usr, ENetPeer *peer);
+
+/* user_free:
+ * entry: takes the user list to free,
+ * exit:  deletes list
+ */
+void user_free(user usr);
+
+
+//These functions are for the game logic
 
 /* user_update_score: (call at the end of an arena game)
  * entry: takes the user list,
@@ -58,16 +76,32 @@ int user_set_arena_id(user usr);
  */
 void user_all_not_ready(user usr);
 
-/* user_remove:
- * entry: takes the user list,
- *        takes the enet_peet to remove
- * exit:  removes the user from the list
- *        returns his assigned arena id to kill him
- */
-int user_remove(user usr, ENetPeer *peer);
+//These functions are for send and recieving packets
 
-/* user_free:
- * entry: takes the user list to free,
- * exit:  deletes list
+/* on connection the server gets a new client, this is w
+ * where the server sends the info about all clients that have joined
  */
-void user_free(user usr);
+void user_send_list(user usr, ENetPeer * newclient, int channel);
+
+/* for the client recieving the list */
+void user_get_list(user usr, ENetPacket * packet);
+
+/* when a client changes their name as it appears on the server */
+/* for the server, gets the name change and then sends the packets out*/
+void user_change_name_send(ENetPacket * packet);
+
+/* for the client */
+void user_get_name_change(int id, ENetPacket * packet);
+
+/* when a new user joins to send his userinfo to the rest of the clients*/
+void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, int channel);
+
+/* for the client */
+void user_get_new_client(user usr, ENetPacket * packet); 
+
+/* when a client disconnects, notify the other users that a user disconnected */
+void user_send_disconnect(int id, int channel, ENetHost * host);
+
+/* for the client */
+void user_get_disconnect(user usr, ENetPacket * packet);
+

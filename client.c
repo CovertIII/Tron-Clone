@@ -73,6 +73,8 @@ void client_connect(client clnt){
 
 void client_disconnect(client clnt){
 	clnt->game_mode = NOT_CONNECTED;
+	user_free(clnt->c_users);
+	clnt->c_users = user_init();
 	chat_add_message(clnt->c_chat, "Client", "You're disconnected from the server.");
 }
 
@@ -87,6 +89,7 @@ void client_render(client clnt){
 	char *buf;
 	glColor3f(1, 1, 1);
 	chat_render(clnt->c_chat, 0);
+	user_render(clnt->c_users);
 	switch(clnt->game_mode){
 		case NOT_CONNECTED:	
 			glPushMatrix();
@@ -120,8 +123,6 @@ void client_render(client clnt){
 }
 
 void client_keys(client clnt, unsigned char key){
-
-
 	switch(clnt->game_mode){
 		case NOT_CONNECTED:
 			not_connected_keys(clnt, key);	
@@ -145,6 +146,15 @@ void client_process_packets(client clnt, ENetEvent *event){
 				chat_add_message(clnt->c_chat, "Server", event->packet->data);
 				break;
 			case 1:
+				user_get_list(clnt->c_users, event->packet);
+				break;
+			case 2:
+				user_get_new_client(clnt->c_users, event->packet);
+				chat_add_message(clnt->c_chat, "Server", "A new person joined");
+				break;
+			case 3:
+				user_get_disconnect(clnt->c_users, event->packet);
+				chat_add_message(clnt->c_chat, "Server", "Someone left");
 				break;
 	}
 }
@@ -185,9 +195,16 @@ static void normal_keys(client clnt, unsigned key){
 		case 'm':
 			clnt->game_mode = MESSAGE;
 			break;
+		case 'N':
+		case 'n':
+			clnt->game_mode = NAME;
+			break;
 		case 27:
 			if(clnt->game_mode != NOT_CONNECTED){
 				clnt->game_mode = NOT_CONNECTED;
+				user_free(clnt->c_users);
+				clnt->c_users = user_init();
+
 				enet_peer_disconnect (clnt->enet_server, 0);
         	
 			    /* Allow up to 3 seconds for the disconnect to succeed
@@ -265,6 +282,7 @@ static void not_connected_keys(client clnt, unsigned key){
 			printf("Connection to %s succeeded.\n", clnt->mbuf);
 			chat_add_message(clnt->c_chat, "Client", disp);
 			clnt->game_mode = NORMAL;	
+			clnt->game_state = LOBBY;
 			clnt->mbuf_num = 0;
 			clnt->mbuf[1] = '\0';
 		}

@@ -80,7 +80,7 @@ void chat_render(chat cht, int type){
 		glLoadIdentity();
 		renderBitmapString(10, 10 + 12*i, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();
-
+		free(buf);
 		cycle = cycle->next;
 		++i;
 	}	
