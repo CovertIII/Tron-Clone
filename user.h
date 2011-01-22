@@ -81,27 +81,30 @@ void user_all_not_ready(user usr);
 /* on connection the server gets a new client, this is w
  * where the server sends the info about all clients that have joined
  */
-void user_send_list(user usr, ENetPeer * newclient, int channel);
+void user_send_list(user usr, ENetHost * host, int channel);
 
 /* for the client recieving the list */
+/* this is what gets updates about the list too:
+ *   call this function in the client to after calling these functions in the server:
+ *    o user_send_list
+ *    o user_send_new_client
+ */
 void user_get_list(user usr, ENetPacket * packet);
 
 /* when a client changes their name as it appears on the server */
-/* for the server, gets the name change and then sends the packets out*/
-void user_change_name_send(ENetPacket * packet);
-
-/* for the client */
-void user_get_name_change(int id, ENetPacket * packet);
+/* for the server: usr is user list to modify, packet is the packet recived by the server with a string of the new name, channel is the new channel to send the name change out to.*/
+void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, int channel);
 
 /* when a new user joins to send his userinfo to the rest of the clients*/
 void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, int channel);
-
-/* for the client */
-void user_get_new_client(user usr, ENetPacket * packet); 
 
 /* when a client disconnects, notify the other users that a user disconnected */
 void user_send_disconnect(int id, int channel, ENetHost * host);
 
 /* for the client */
 void user_get_disconnect(user usr, ENetPacket * packet);
+
+void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, int channel);
+
+void user_get_chat_message(user usr, chat cht, ENetPacket *packet);
 

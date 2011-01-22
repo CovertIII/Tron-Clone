@@ -4,8 +4,8 @@
 #include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
-#include "user.h"
 #include "chat.h"
+#include "user.h"
 #include "server.h"
 
 #define LOBBY 0
@@ -46,8 +46,7 @@ void server_add_user(server svr, ENetPeer *peer){
 			user_add(svr->s_users, peer, WAITING);
 			break;
 	}
-	user_send_list(svr->s_users, peer, 1);
-	user_send_new_client(svr->s_users, peer, svr->enet_server, 2);
+	user_send_list(svr->s_users, svr->enet_server, 1);
 	/* TODO: Send information to the new client about the world:
 	 *         o list of the users including himself
 	 *         o state of the server
@@ -63,7 +62,7 @@ void server_remove_user(server svr, ENetPeer *peer){
 	user_send_disconnect(id, 3, svr->enet_server);
 }
 void server_update(server svr, double dt){
-	printf("GS: %d\n", svr->game_state);
+	//printf("GS: %d\n", svr->game_state);
 	switch(svr->game_state){
 		case LOBBY:
 			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){
@@ -114,10 +113,10 @@ void server_process_packet(server svr, ENetEvent event){
 	ENetPacket * packet;
 	switch(event.channelID){
 			case 0:
-				packet = enet_packet_create (event.packet->data, strlen (event.packet->data) + 1, ENET_PACKET_FLAG_RELIABLE);
-				enet_host_broadcast (svr->enet_server, 0, packet);
+				user_send_chat_message(svr->s_users, &event, svr->enet_server, 0);
 				break;
 			case 1:
+				user_change_name_send(svr->s_users, svr->enet_server, &event, 1);
 				break;
 	}
 }

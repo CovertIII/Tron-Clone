@@ -5,8 +5,8 @@
 #include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
-#include "user.h"
 #include "chat.h"
+#include "user.h"
 #include "client.h"
 
 #define LOBBY 0
@@ -112,11 +112,8 @@ void client_render(client clnt){
 		case NAME:
 			glPushMatrix();
 			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 3, GLUT_BITMAP_HELVETICA_10, "What would you like your name to be?");
-			glPopMatrix();
-			glPushMatrix();
-			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-15, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
+			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 15, GLUT_BITMAP_HELVETICA_10, "What would you like your name to be?");
+			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
 			glPopMatrix();
 			break;
 	}
@@ -143,14 +140,10 @@ void client_process_packets(client clnt, ENetEvent *event){
 	ENetPacket * packet;
 	switch(event->channelID){
 			case 0:
-				chat_add_message(clnt->c_chat, "Server", event->packet->data);
+				user_get_chat_message(clnt->c_users, clnt->c_chat, event->packet);
 				break;
 			case 1:
 				user_get_list(clnt->c_users, event->packet);
-				break;
-			case 2:
-				user_get_new_client(clnt->c_users, event->packet);
-				chat_add_message(clnt->c_chat, "Server", "A new person joined");
 				break;
 			case 3:
 				user_get_disconnect(clnt->c_users, event->packet);
@@ -228,8 +221,6 @@ static void normal_keys(client clnt, unsigned key){
 				enet_peer_reset (clnt->enet_server);
 			}
 			break;
-		case 'N':
-			break;
 	}
 }
 
@@ -238,12 +229,10 @@ static void message_keys(client clnt, unsigned key){
 	ENetAddress address;
 	ENetEvent event;
 	char disp [500];
-	//Connect to the server using the string in mbuf as the address upon hitting return.
 	if(get_input(clnt, key)){
 		clnt->mbuf[clnt->mbuf_num] = '\0';
 		packet = enet_packet_create (clnt->mbuf, strlen (clnt->mbuf) + 1, ENET_PACKET_FLAG_RELIABLE);
 		enet_peer_send (clnt->enet_server, 0, packet);
-		//enet_host_flush (client);
 	
 		clnt->mbuf_num = 0;
 		clnt->mbuf[1] = '\0';	
@@ -254,6 +243,22 @@ static void message_keys(client clnt, unsigned key){
 }
 
 static void name_keys(client clnt, unsigned key){
+	ENetPacket * packet;
+	ENetAddress address;
+	ENetEvent event;
+	char disp [500];
+	if(get_input(clnt, key)){
+		clnt->mbuf[clnt->mbuf_num] = '\0';
+		packet = enet_packet_create (clnt->mbuf, strlen (clnt->mbuf) + 1, ENET_PACKET_FLAG_RELIABLE);
+		enet_peer_send (clnt->enet_server, 1, packet);
+	
+		clnt->mbuf_num = 0;
+		clnt->mbuf[1] = '\0';	
+		clnt->game_mode = NORMAL;
+	}
+	if(key == 27)
+		{clnt->game_mode = NORMAL;}
+	
 }
 
 static void not_connected_keys(client clnt, unsigned key){

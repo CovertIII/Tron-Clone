@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <GLUT/GLUT.h>
 #include <enet/enet.h>
 #include <tpl.h>
+#include "chat.h"
 #include "user.h"
 
 typedef struct{
@@ -40,6 +42,13 @@ user user_init(void){
 }
 
 int user_add_list(user usr, user_info ui){
+	usernode * cycle;
+	for(cycle = usr->head; cycle != NULL; cycle = cycle->next){
+		if(ui.id == cycle->ui.id){
+			cycle->ui = ui;
+			return;
+		}
+	}
 	usernode *user;
 	usr->user_num++;
 	user = (usernode*)malloc(sizeof(usernode));
@@ -56,7 +65,8 @@ int user_add_list(user usr, user_info ui){
 int user_add(user usr, ENetPeer *peer, int status){
 	usernode *user;
 	user = (usernode*)malloc(sizeof(usernode));
-	user->ui.name = "No Name";
+	user->ui.name = (char*)malloc(sizeof(char)*8);
+	strcpy(user->ui.name, "No Name");
 	user->ui.peer = peer;
 	user->ui.status = status;
 	user->ui.score = 0;
@@ -151,10 +161,10 @@ void user_render(user usr){
 	int i = 0;
 	usernode *cycle = usr->head;
 	char buf[50];
-	sprintf(buf, "%d", usr->user_num);	
+	sprintf(buf, "%d users:", usr->user_num);	
 	glPushMatrix();
 	glLoadIdentity();
-	renderBitmapString(30, glutGet(GLUT_WINDOW_HEIGHT)-40, GLUT_BITMAP_HELVETICA_10, buf);
+	renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-40, GLUT_BITMAP_HELVETICA_10, buf);
 	glPopMatrix();
 
 	while(cycle != NULL){
@@ -162,7 +172,7 @@ void user_render(user usr){
 		sprintf(buf, "%s: %d", cycle->ui.name, cycle->ui.id);	
 		glPushMatrix();
 		glLoadIdentity();
-		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-40-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();
 		cycle = cycle->next;
 		i++;
@@ -226,7 +236,7 @@ void user_all_not_ready(user usr){
 	}
 }
 
-void user_send_list(user usr, ENetPeer * newclient, int channel){
+void user_send_list(user usr, ENetHost * host, int channel){
 	user_info ui_p;
 	usernode *cycle;
 	tpl_node *tn;
@@ -243,7 +253,7 @@ void user_send_list(user usr, ENetPeer * newclient, int channel){
 	
 	ENetPacket * packet;
 	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send (newclient, channel, packet);	
+	enet_host_broadcast (host, channel, packet);
 	free(addr);
 }	
 
@@ -271,32 +281,15 @@ void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, int channel
 	void *addr;
 	size_t len;
 
-	tn = tpl_map("S(siiiii)", &ui_p);
-	tpl_pack(tn,0);
+	tn = tpl_map("A(S(siiiii))", &ui_p);
+	tpl_pack(tn, 1);
 	tpl_dump(tn, TPL_MEM, &addr, &len);
 	tpl_free(tn);
-
+	
 	ENetPacket * packet;
 	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
 	enet_host_broadcast (host, channel, packet);
 	free(addr);
-}
-
-void user_get_new_client(user usr, ENetPacket * packet){
-	tpl_node * tn;
-	user_info ui_p;
-	tn = tpl_map("S(siiiii)", &ui_p);
-	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
-	tpl_unpack(tn, 0);
-	tpl_free(tn);
-
-	usernode * cycle;
-	for(cycle = usr->head; cycle != NULL; cycle = cycle->next){
-		if(ui_p.id == cycle->ui.id)
-			{return;}
-	}
-	
-	user_add_list(usr, ui_p);
 }
 
 void user_send_disconnect(int id, int channel, ENetHost * host){
@@ -327,6 +320,73 @@ void user_get_disconnect(user usr, ENetPacket * packet){
 	user_remove_id(usr, id_p);
 }
 	
+void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, int channel){
+	usernode * cycle;
+	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
+		//find the user that equals the event peer
+		if(cycle->ui.peer == event->peer){
+			char *tmp;
+			tmp = (char*)malloc(event->packet->dataLength);
+			if(tmp == NULL){fprintf(stderr, "Out of memory"); return;}
+			//copy the string in packet data to user name
+			strcpy(tmp, event->packet->data);
+			free(cycle->ui.name);
+			cycle->ui.name = tmp;
+
+			//send the updated user via send_new_client	
+			user_send_new_client(usr,cycle->ui.peer, server, channel);
+			return;
+		}
+	}
+	return;
+}
+
+void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, int channel){
+	//find id of the peer who sent the chat message
+	usernode * cycle;
+	int id;
+	for (cycle = usr->head; cycle !=NULL; cycle = cycle->next){
+		if(cycle->ui.peer == event->peer){
+			id = cycle->ui.id;
+			break;
+		}
+	}
+	if(cycle == NULL){return;}
+
+	//pack up the id and message
+	tpl_node *tn;
+	void *addr;
+	size_t len;
+
+	tn = tpl_map("is", &id, &event->packet->data);
+	tpl_pack(tn, 0);
+	tpl_dump(tn, TPL_MEM, &addr, &len);
+	tpl_free(tn);
+	
+	//broadcast the package	
+	ENetPacket * packet;
+	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+	enet_host_broadcast (host, channel, packet);
+	free(addr);
+}
+
+void user_get_chat_message(user usr, chat cht, ENetPacket *packet){
+	int id;
+	char *msg;
+	tpl_node * tn;
+	tn = tpl_map("is", &id, &msg);
+	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
+	tpl_unpack(tn, 0);
+	tpl_free(tn);
+
+	usernode *cycle;
+	for (cycle = usr->head; cycle !=NULL; cycle = cycle->next){
+		if(cycle->ui.id == id){
+			chat_add_message(cht, cycle->ui.name, msg);	
+			return;
+		}
+	}
+}
 
 static void renderBitmapString(
 						float x, 
