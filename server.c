@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <tpl.h>
 #include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
@@ -12,6 +13,10 @@
 #define PREGAME 1
 #define GAME 2
 #define POSTGAME 3
+
+
+
+void server_send_gm_init(server svr, float timer, int ply_num, int x_bd, int y_bd, int channel);
 
 typedef struct servertype{
 	int game_state;
@@ -47,12 +52,6 @@ void server_add_user(server svr, ENetPeer *peer){
 			break;
 	}
 	user_send_list(svr->s_users, svr->enet_server, 1);
-	/* TODO: Send information to the new client about the world:
-	 *         o list of the users including himself
-	 *         o state of the server
-	 *         o if the game is in progress, send a message to wait for the game to be over.
-	*/
-	//TODO: Send information to the rest of the clients to let them know a new person has joined.
 }
 
 void server_remove_user(server svr, ENetPeer *peer){ 
@@ -70,6 +69,7 @@ void server_update(server svr, double dt){
 				svr->timer = 5.0f;
 				int ply_num = user_set_arena_id(svr->s_users);
 				svr->s_game = arena_init(ply_num, 0, 800, 600);
+				server_send_gm_init(svr, svr->timer, ply_num, 800, 600, 2);
 				//TODO:  Maybe let the client know that we are switching to the pregame state
 				//       and to set its timer to the server pregame timer.
 				//       tell the client to init an arena with the ply_num (AI currently not implemented)
@@ -118,5 +118,26 @@ void server_process_packet(server svr, ENetEvent event){
 			case 1:
 				user_change_name_send(svr->s_users, svr->enet_server, &event, 1);
 				break;
+			case 2:
+				user_sget_send_pstate(svr->s_users, svr->enet_server,  &event, 1);
 	}
 }
+
+void server_send_gm_init(server svr, float timer, int ply_num, int x_bd, int y_bd, int channel){
+	tpl_node *tn;
+	void *addr;
+	size_t len;
+
+	tn = tpl_map("fiii", &timer, &ply_num, &x_bd, &y_bd);
+	tpl_pack(tn, 0);
+	tpl_dump(tn, TPL_MEM, &addr, &len);
+	tpl_free(tn);
+	
+	//broadcast the package	
+	ENetPacket * packet;
+	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+	enet_host_broadcast (svr->enet_server, channel, packet);
+	free(addr);
+}
+
+

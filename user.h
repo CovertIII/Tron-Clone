@@ -108,3 +108,5 @@ void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, int ch
 
 void user_get_chat_message(user usr, chat cht, ENetPacket *packet);
 
+void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, int channel);
+

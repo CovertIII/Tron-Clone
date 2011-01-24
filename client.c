@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <GLUT/GLUT.h>
+#include <tpl.h>
 #include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
@@ -19,6 +20,8 @@
 #define MESSAGE 2
 #define NAME 3
 #define COMMAND 4
+
+
 
 typedef struct clienttype{
 	ENetPeer * enet_server;
@@ -45,6 +48,8 @@ static void not_connected_keys(client clnt, unsigned key);
 static void message_keys(client clnt, unsigned key);
 
 static void name_keys(client clnt, unsigned key);
+
+static void client_get_game_init(client clnt, ENetPacket * packet);
 
 client client_init(ENetHost * enet_client){
 	client clnt;
@@ -88,8 +93,6 @@ void client_update(client clnt, double dt){
 void client_render(client clnt){
 	char *buf;
 	glColor3f(1, 1, 1);
-	chat_render(clnt->c_chat, 0);
-	user_render(clnt->c_users);
 	switch(clnt->game_mode){
 		case NOT_CONNECTED:	
 			glPushMatrix();
@@ -117,6 +120,18 @@ void client_render(client clnt){
 			glPopMatrix();
 			break;
 	}
+	switch(clnt->game_state){
+		case LOBBY:
+			chat_render(clnt->c_chat, 0);
+			user_render(clnt->c_users);
+			break;
+		case GAME:
+		case POSTGAME:
+		case PREGAME:
+			arena_render(clnt->c_game);
+			chat_render(clnt->c_chat, 1);
+			break;
+	}		
 }
 
 void client_keys(client clnt, unsigned char key){
@@ -137,7 +152,6 @@ void client_keys(client clnt, unsigned char key){
 }
 
 void client_process_packets(client clnt, ENetEvent *event){
-	ENetPacket * packet;
 	switch(event->channelID){
 			case 0:
 				user_get_chat_message(clnt->c_users, clnt->c_chat, event->packet);
@@ -145,9 +159,14 @@ void client_process_packets(client clnt, ENetEvent *event){
 			case 1:
 				user_get_list(clnt->c_users, event->packet);
 				break;
+			case 2:
+				client_get_game_init(clnt, event->packet);
+				break;
 			case 3:
 				user_get_disconnect(clnt->c_users, event->packet);
 				chat_add_message(clnt->c_chat, "Server", "Someone left");
+				break;
+			default:
 				break;
 	}
 }
@@ -183,7 +202,13 @@ static int get_input(client clnt, unsigned char key) {
 
 static void normal_keys(client clnt, unsigned key){
 	ENetEvent event;
+	ENetPacket * packet;
 	switch(key){
+		case ' ':
+			clnt->mbuf[clnt->mbuf_num] = '\0';
+			packet = enet_packet_create (clnt->mbuf, strlen (clnt->mbuf) + 1, ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send (clnt->enet_server, 2, packet);
+			break;
 		case 'M':
 		case 'm':
 			clnt->game_mode = MESSAGE;
@@ -212,6 +237,9 @@ static void normal_keys(client clnt, unsigned key){
 			    		case ENET_EVENT_TYPE_DISCONNECT:
 					   		printf("You left the server.\n");
 							chat_add_message(clnt->c_chat, "Client", "You left the server.  Push <esc> again to exit the game");
+							clnt->game_state = LOBBY;
+							arena_free(clnt->c_game);
+							clnt->c_game = NULL;
 			        	return;
 			    	}
 				}
@@ -316,4 +344,23 @@ static void renderBitmapString(
 		glutBitmapCharacter(font, *c);
 	}
 }
+
+static void client_get_game_init(client clnt, ENetPacket * packet){
+	double timer = 5.0f;
+	int ply_num = 2, x_bd = 800, y_bd = 600;
+	tpl_node * tn;
+	
+	tn = tpl_map("fiii", &timer, &ply_num, &x_bd, &y_bd);
+	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
+	tpl_unpack(tn, 0);
+	tpl_free(tn);
+
+	clnt->game_state = PREGAME;
+	clnt->timer = timer;
+	clnt->c_game = arena_init(ply_num, 0, x_bd, y_bd);
+}
+
+
+
+
 

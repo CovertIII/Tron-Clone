@@ -26,6 +26,7 @@ typedef struct usertype{
 	usernode* head;
 	usernode* tail;
 	int user_num;
+	int user_id;
 } usertype;
 
 static void renderBitmapString(float x, float y, void *font, char *string); 
@@ -38,6 +39,7 @@ user user_init(void){
 	usr->head = NULL;
 	usr->tail = NULL;
 	usr->user_num = 0;
+	usr->user_id = 0;
 	return usr;
 }
 
@@ -70,9 +72,10 @@ int user_add(user usr, ENetPeer *peer, int status){
 	user->ui.peer = peer;
 	user->ui.status = status;
 	user->ui.score = 0;
-	user->ui.id = usr->user_num;
+	user->ui.id = usr->user_id;
 	user->next = NULL;
 	usr->user_num++;
+	usr->user_id++;
 	if(usr->head == NULL){
 		usr->head = usr->tail = user;
 		return;
@@ -99,16 +102,19 @@ int user_remove_id(user usr, int id){
 		if(cycle->next == NULL)
 			{usr->tail = NULL;}
 		free(cycle);
+		usr->user_num--;
 		return id;
 	}
 	if(cycle->next == NULL){
 		usr->tail = prev;
 		prev->next = NULL;
 		free(cycle);
+		usr->user_num--;
 		return id;
 	}
 	prev->next = cycle->next;
 	free(cycle);
+	usr->user_num--;
 	return id;
 }
 int user_remove(user usr, ENetPeer *peer){
@@ -130,16 +136,19 @@ int user_remove(user usr, ENetPeer *peer){
 		if(cycle->next == NULL)
 			{usr->tail = NULL;}
 		free(cycle);
+		usr->user_num--;
 		return id;
 	}
 	if(cycle->next == NULL){
 		usr->tail = prev;
 		prev->next = NULL;
 		free(cycle);
+		usr->user_num--;
 		return id;
 	}
 	prev->next = cycle->next;
 	free(cycle);
+	usr->user_num--;
 	return id;
 }
 
@@ -169,7 +178,23 @@ void user_render(user usr){
 
 	while(cycle != NULL){
 		char buf[50];
-		sprintf(buf, "%s: %d", cycle->ui.name, cycle->ui.id);	
+		char status[10];
+		switch(cycle->ui.status){
+			case 0:
+				strcpy(status, "Not Ready");
+				break;
+			case 1:
+				strcpy(status, "Ready");
+				break;
+			case 2:
+				strcpy(status, "Playing");
+				break;
+			case 3:
+				strcpy(status, "Waiting");
+				break;
+		}
+
+		sprintf(buf, "%.2d: %s    %s", cycle->ui.id, cycle->ui.name, status);	
 		glPushMatrix();
 		glLoadIdentity();
 		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
@@ -386,6 +411,21 @@ void user_get_chat_message(user usr, chat cht, ENetPacket *packet){
 			return;
 		}
 	}
+}
+
+void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, int channel){
+	usernode * cycle;
+	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
+		//find the user that equals the event peer
+		if(cycle->ui.peer == event->peer){
+			cycle->ui.status = READY;
+
+			//send the updated user via send_new_client	
+			user_send_new_client(usr,cycle->ui.peer, server, channel);
+			return;
+		}
+	}
+	return;
 }
 
 static void renderBitmapString(
