@@ -85,6 +85,7 @@ void client_disconnect(client clnt){
 
 void client_update(client clnt, double dt){
 	clnt->ctimer += dt;
+	clnt->timer -= dt;
 	clnt->mbuf[clnt->mbuf_num] = clnt->ctimer < 0.5 ? '|' : ' '; 
 	if(clnt->ctimer > 1)
 		{clnt->ctimer = 0;}
@@ -130,6 +131,15 @@ void client_render(client clnt){
 		case PREGAME:
 			arena_render(clnt->c_game);
 			chat_render(clnt->c_chat, 1);
+			if(clnt->timer > 0 ){
+				//draw timer here.
+				char buf[5];
+				sprintf(buf, "%.1f", clnt->timer);
+				glPushMatrix();
+				glLoadIdentity();
+				renderBitmapString(glutGet(GLUT_WINDOW_WIDTH)/2, glutGet(GLUT_WINDOW_HEIGHT)/2, GLUT_BITMAP_HELVETICA_18, buf);
+				glPopMatrix();
+			}
 			break;
 	}		
 }
@@ -165,6 +175,9 @@ void client_process_packets(client clnt, ENetEvent *event){
 			case 3:
 				user_get_disconnect(clnt->c_users, event->packet);
 				chat_add_message(clnt->c_chat, "Server", "Someone left");
+				break;
+			case 4:
+				arena_get_update(clnt->c_game, event->packet);
 				break;
 			default:
 				break;
@@ -346,8 +359,8 @@ static void renderBitmapString(
 }
 
 static void client_get_game_init(client clnt, ENetPacket * packet){
-	double timer = 5.0f;
-	int ply_num = 2, x_bd = 800, y_bd = 600;
+	double timer;
+	int ply_num, x_bd, y_bd;
 	tpl_node * tn;
 	
 	tn = tpl_map("fiii", &timer, &ply_num, &x_bd, &y_bd);

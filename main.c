@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <GLUT/glut.h>
+#include <enet/enet.h>
 #include "vector2.h"
 #include "arena.h"
 
@@ -13,7 +14,7 @@
 #define TWIXT_TIME 5.0f
 
 int lastFrameTime = 0;
-int frame=0,time, fps, timebase=0;
+int frame=0,trontime, fps, timebase=0;
 
 vector2 movin = {0,0};
 vector2 movin2 = {0,0};
@@ -134,11 +135,11 @@ void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	frame++;
-	time=glutGet(GLUT_ELAPSED_TIME);
+	trontime=glutGet(GLUT_ELAPSED_TIME);
 	
-	if (time - timebase > 500) {
-		fps = frame*1000.0/(time-timebase);
-	 	timebase = time;		
+	if (trontime - timebase > 500) {
+		fps = frame*1000.0/(trontime-timebase);
+	 	timebase = trontime;		
 		frame = 0;
 	}
 	

@@ -41,3 +41,8 @@ void player_render(player plyr);
 
 /**** player_free: ****/
 void player_free(player plyr);
+
+
+void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel);
+
+void player_get_update(player *actors, ENetPacket * packet);

@@ -1,10 +1,11 @@
-#include "arena.h"
-#include "player.h"
-#include "vector2.h"
 #include <math.h>
 #include <GLUT/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <enet/enet.h>
+#include "vector2.h"
+#include "player.h"
+#include "arena.h"
 
 typedef struct arenatype {
 	int plyr_nm;
@@ -122,3 +123,18 @@ void arena_free(arena arna){
 	free(arna->actors);
 	free(arna);
 }
+
+
+void arena_send_update(arena arna, ENetHost * enet_server, int channel){
+	//cycle through the players and send them
+	int i;
+	for (i = 0; i < arna->plyr_nm; i++){
+		player_send_update(arna->actors[i], i, enet_server, channel);	
+	}
+}
+
+
+void arena_get_update(arena arna, ENetPacket * packet){
+	player_get_update(arna->actors, packet);
+}
+

@@ -1,6 +1,8 @@
 #include <GLUT/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <enet/enet.h>
+#include <tpl.h>
 
 #include "vector2.h"
 #include "player.h"
@@ -17,11 +19,11 @@
 typedef struct playertype {
 	vector2 p;
 	vector2 v;
-	float vel;
-	float a;
-	float th;
-	float w;
-	float length;
+	double vel;
+	double a;
+	double th;
+	double w;
+	double length;
 	int trailtoggle;	
 	int dead;
 	traillist trails;	
@@ -182,3 +184,38 @@ void player_free(player plyr){
 	trail_free(plyr->trails);
 	free(plyr);
 }
+
+void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel){
+	playertype splyr = *plyr;
+	tpl_node *tn;
+	void *addr;
+	size_t len;
+
+	tn = tpl_map("iS($(ff)$(ff)fffffii)", &plyr_id, &splyr);
+	tpl_pack(tn, 0);
+	tpl_dump(tn, TPL_MEM, &addr, &len);
+	tpl_free(tn);
+	
+	ENetPacket * packet;
+	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+	enet_host_broadcast (host, channel, packet);
+	free(addr);
+}
+
+void player_get_update(player *actors, ENetPacket * packet){
+	int plyr_id;
+	playertype splyr;
+	tpl_node * tn;
+	tn = tpl_map("iS($(ff)$(ff)fffffii)", &plyr_id, &splyr);
+	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
+	tpl_unpack(tn,0); 
+	tpl_free(tn);
+
+	traillist tmp_trail = actors[plyr_id]->trails;
+	particles tmp_part = actors[plyr_id]->ghost;
+
+	*actors[plyr_id] = splyr;
+	actors[plyr_id]->trails = tmp_trail;
+	actors[plyr_id]->ghost = tmp_part;
+}
+

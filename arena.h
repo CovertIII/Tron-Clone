@@ -55,3 +55,8 @@ int arena_plyr_tg(arena arna, int plyr_id);
  * On Exit: frees up all the memory used by an arena
  */
 void arena_free(arena arna);
+
+void arena_send_update(arena arna, ENetHost * enet_server, int channel);
+
+void arena_get_update(arena arna, ENetPacket * packet);
+

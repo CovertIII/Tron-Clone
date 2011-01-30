@@ -16,7 +16,7 @@
 
 
 
-void server_send_gm_init(server svr, float timer, int ply_num, int x_bd, int y_bd, int channel);
+void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, int channel);
 
 typedef struct servertype{
 	int game_state;
@@ -61,7 +61,7 @@ void server_remove_user(server svr, ENetPeer *peer){
 	user_send_disconnect(id, 3, svr->enet_server);
 }
 void server_update(server svr, double dt){
-	//printf("GS: %d\n", svr->game_state);
+	printf("%d ", svr->game_state);
 	switch(svr->game_state){
 		case LOBBY:
 			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){
@@ -69,14 +69,15 @@ void server_update(server svr, double dt){
 				svr->timer = 5.0f;
 				int ply_num = user_set_arena_id(svr->s_users);
 				svr->s_game = arena_init(ply_num, 0, 800, 600);
-				server_send_gm_init(svr, svr->timer, ply_num, 800, 600, 2);
-				//TODO:  Maybe let the client know that we are switching to the pregame state
+				// let the client know that we are switching to the pregame state
 				//       and to set its timer to the server pregame timer.
 				//       tell the client to init an arena with the ply_num (AI currently not implemented)
+				server_send_gm_init(svr, svr->timer, ply_num, 800, 600, 2);
 			}
 			break;
 		case PREGAME:
 			svr->timer -= dt;
+			arena_send_update(svr->s_game, svr->enet_server, 4);
 			if(svr->timer < 0){
 				svr->game_state = GAME;
 				//TODO: let clients know we are in game state now.
@@ -84,6 +85,7 @@ void server_update(server svr, double dt){
 			break;
 		case GAME:
 			arena_update(svr->s_game, dt);
+			arena_send_update(svr->s_game, svr->enet_server, 4);
 			//TODO: send the game updates here. (if someone dies send that info, put don't send the particle system)
 			if(arena_player_status(svr->s_game) <= 1){
 				int winner_id; //= arena_winner(svr->s_game);
@@ -96,6 +98,7 @@ void server_update(server svr, double dt){
 		case POSTGAME:
 			arena_update(svr->s_game, dt);
 			//TODO: send game updates here as well.
+			arena_send_update(svr->s_game, svr->enet_server, 4);
 			svr->timer -= dt;
 			if(svr->timer < 0){
 				arena_free(svr->s_game);
@@ -123,7 +126,7 @@ void server_process_packet(server svr, ENetEvent event){
 	}
 }
 
-void server_send_gm_init(server svr, float timer, int ply_num, int x_bd, int y_bd, int channel){
+void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, int channel){
 	tpl_node *tn;
 	void *addr;
 	size_t len;

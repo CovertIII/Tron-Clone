@@ -24,7 +24,7 @@ main_client.o: main_client.c client.h vector2.h
 	$(CC) $(CFLAGS) -c main_client.c
 
 tron: main.o $(GAMEOBJ)
-	$(CC) $(CFLAGS) $(MACFLAGS) $(COCOA) main.o $(GAMEOBJ) -o tron
+	$(CC) $(CFLAGS) $(NETLIBS) $(MACFLAGS) $(COCOA) main.o $(GAMEOBJ) -o tron
 
 main.o:	main.c arena.h
 	$(CC) $(CFLAGS) -c main.c
@@ -45,7 +45,7 @@ traillist.o: traillist.c traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c traillist.c
 
 player.o: player.c player.h traillist.h particle_sys.h plist.h collison.h vector2.h
-	$(CC) $(CFLAGS) -c player.c
+	$(CC) $(CFLAGS) $(NETLIBS)	-c player.c
 
 arena.o: arena.c arena.h traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c arena.c
