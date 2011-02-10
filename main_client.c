@@ -4,8 +4,8 @@
 #include <math.h>
 #include <GLUT/glut.h>
 #include <enet/enet.h>
-#include "client.h"
 #include "vector2.h"
+#include "client.h"
 
 vector2 movin = {0,0};
 
@@ -26,9 +26,9 @@ int init_network(void){
 
 	enet_client = enet_host_create (NULL /* create a client host */,
 							   1 /* only allow 1 outgoing connection */,
-							   10/* allow up 4 channels to be used, 0 and 1 */,
-							   57600 / 8 /* 56K modem with 56 Kbps downstream bandwidth */,
-							   14400 / 8 /* 56K modem with 14 Kbps upstream bandwidth */);
+							   0 /* allow up 4 channels to be used, 0 and 1 */,
+							   0 /* 56K modem with 56 Kbps downstream bandwidth */,
+							   0 /* 56K modem with 14 Kbps upstream bandwidth */);
    
    if (enet_client == NULL)
    {

@@ -16,7 +16,9 @@
 
 
 
-void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, int channel);
+void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, enet_uint8 channel);
+
+void server_send_gm_free(server svr, enet_uint8 channel);
 
 typedef struct servertype{
 	int game_state;
@@ -61,7 +63,6 @@ void server_remove_user(server svr, ENetPeer *peer){
 	user_send_disconnect(id, 3, svr->enet_server);
 }
 void server_update(server svr, double dt){
-	printf("%d ", svr->game_state);
 	switch(svr->game_state){
 		case LOBBY:
 			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){
@@ -104,6 +105,7 @@ void server_update(server svr, double dt){
 				arena_free(svr->s_game);
 				svr->game_state = LOBBY;
 				user_all_not_ready(svr->s_users);
+				server_send_gm_free(svr, 5);
 				//TODO: Let clients know that we are in the lobby now.
 				//TODO: send all user data to clients to ensure the games are in snyc.
 			}
@@ -114,6 +116,7 @@ void server_update(server svr, double dt){
 
 void server_process_packet(server svr, ENetEvent event){
 	ENetPacket * packet;
+	printf("Channel Limit %d\n", svr->enet_server->channelLimit);
 	switch(event.channelID){
 			case 0:
 				user_send_chat_message(svr->s_users, &event, svr->enet_server, 0);
@@ -126,7 +129,7 @@ void server_process_packet(server svr, ENetEvent event){
 	}
 }
 
-void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, int channel){
+void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_bd, enet_uint8 channel){
 	tpl_node *tn;
 	void *addr;
 	size_t len;
@@ -143,4 +146,9 @@ void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_
 	free(addr);
 }
 
+void server_send_gm_free(server svr, enet_uint8 channel){
+	ENetPacket * packet;
+	packet = enet_packet_create ("HI", sizeof("Hi"+1), ENET_PACKET_FLAG_RELIABLE);
+	enet_host_broadcast (svr->enet_server, channel, packet);
+}
 

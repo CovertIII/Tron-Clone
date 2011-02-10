@@ -59,6 +59,7 @@ client client_init(ENetHost * enet_client){
 
 	clnt->game_state = LOBBY;
 	clnt->game_mode = NOT_CONNECTED;
+	
 	clnt->c_game = NULL;
 	clnt->c_chat = chat_init();
 	clnt->c_users = user_init();	
@@ -80,6 +81,10 @@ void client_disconnect(client clnt){
 	clnt->game_mode = NOT_CONNECTED;
 	user_free(clnt->c_users);
 	clnt->c_users = user_init();
+	if(clnt->c_game != NULL){
+		arena_free(clnt->c_game);
+		clnt->c_game = NULL;
+	}
 	chat_add_message(clnt->c_chat, "Client", "You're disconnected from the server.");
 }
 
@@ -179,7 +184,8 @@ void client_process_packets(client clnt, ENetEvent *event){
 			case 4:
 				arena_get_update(clnt->c_game, event->packet);
 				break;
-			default:
+			case 5:
+				//TODO: write this function: client_get_game_free(clnt);
 				break;
 	}
 }
@@ -251,7 +257,7 @@ static void normal_keys(client clnt, unsigned key){
 					   		printf("You left the server.\n");
 							chat_add_message(clnt->c_chat, "Client", "You left the server.  Push <esc> again to exit the game");
 							clnt->game_state = LOBBY;
-							arena_free(clnt->c_game);
+							if(clnt->c_game != NULL) {arena_free(clnt->c_game);}
 							clnt->c_game = NULL;
 			        	return;
 			    	}
@@ -315,7 +321,7 @@ static void not_connected_keys(client clnt, unsigned key){
 		address.port = 5001;
 
 		/* Initiate the connection. The third argument is the number of channels, the 4th is user supplied data.*/
-		clnt->enet_server = enet_host_connect (clnt->enet_client, & address, 4, 0);    
+		clnt->enet_server = enet_host_connect (clnt->enet_client, & address, 255, 0);    
 
 		if (clnt->enet_server == NULL){
 			fprintf (stderr,"No available peers for initiating an ENet connection.\n");

@@ -93,10 +93,10 @@ void user_get_list(user usr, ENetPacket * packet);
 
 /* when a client changes their name as it appears on the server */
 /* for the server: usr is user list to modify, packet is the packet recived by the server with a string of the new name, channel is the new channel to send the name change out to.*/
-void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, int channel);
+void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel);
 
 /* when a new user joins to send his userinfo to the rest of the clients*/
-void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, int channel);
+void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, enet_uint8 channel);
 
 /* when a client disconnects, notify the other users that a user disconnected */
 void user_send_disconnect(int id, int channel, ENetHost * host);
@@ -104,9 +104,9 @@ void user_send_disconnect(int id, int channel, ENetHost * host);
 /* for the client */
 void user_get_disconnect(user usr, ENetPacket * packet);
 
-void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, int channel);
+void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, enet_uint8 channel);
 
 void user_get_chat_message(user usr, chat cht, ENetPacket *packet);
 
-void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, int channel);
+void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel);
 

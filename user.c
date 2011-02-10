@@ -293,7 +293,7 @@ void user_get_list(user usr, ENetPacket * packet){
 	tpl_free(tn);
 }
 
-void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, int channel){
+void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, enet_uint8 channel){
 	user_info ui_p;
 	usernode *cycle;
 	for(cycle = usr->head; cycle != NULL; cycle = cycle->next){
@@ -345,7 +345,7 @@ void user_get_disconnect(user usr, ENetPacket * packet){
 	user_remove_id(usr, id_p);
 }
 	
-void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, int channel){
+void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel){
 	usernode * cycle;
 	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
 		//find the user that equals the event peer
@@ -366,7 +366,7 @@ void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, int 
 	return;
 }
 
-void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, int channel){
+void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, enet_uint8 channel){
 	//find id of the peer who sent the chat message
 	usernode * cycle;
 	int id;
@@ -413,7 +413,7 @@ void user_get_chat_message(user usr, chat cht, ENetPacket *packet){
 	}
 }
 
-void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, int channel){
+void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel){
 	usernode * cycle;
 	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
 		//find the user that equals the event peer

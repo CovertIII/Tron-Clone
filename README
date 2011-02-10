@@ -7,3 +7,9 @@ plan on to have it networked.  So in the future there will be a
 server and client.  Right now I am still working on the game logic.
 Mess around with this if you would like to.  It is not really 
 playable now.
+
+There are three executables made by the project: tron, tserver, 
+tclient.  tron is a program to test the game; it is a two player 
+game, but you will have to share the same keyboard to play.  The 
+server, tserver, is a server to host a multiplayer game played over
+a LAN.  tclient is the client.  The multiplayer aspect isn't done yet.
