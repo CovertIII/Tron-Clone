@@ -110,3 +110,5 @@ void user_get_chat_message(user usr, chat cht, ENetPacket *packet);
 
 void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel);
 
+int user_peer_aid(user usr, ENetPeer * peer);
+

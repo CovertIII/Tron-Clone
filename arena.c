@@ -87,6 +87,12 @@ void arena_update(arena arna, double dt){
 	}
 }
 
+void arena_update_client(arena arna, double dt){
+	int i;
+	for(i=0; i<arna->plyr_nm; i++){
+		player_update(arna->actors[i], dt);
+	}
+}
 void arena_render(arena arna){
 	int i;
 	for (i=0; i < arna->plyr_nm; i++){

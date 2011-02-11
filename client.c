@@ -21,7 +21,12 @@
 #define NAME 3
 #define COMMAND 4
 
-
+typedef struct tronkeys{
+	char lr;
+	char ud;
+	char t;
+	char s;
+} tronkeys;
 
 typedef struct clienttype{
 	ENetPeer * enet_server;
@@ -32,6 +37,7 @@ typedef struct clienttype{
 	chat c_chat;
 	user c_users;
 	char mbuf[500];
+	tronkeys g_keys;
 	int mbuf_num;
 	double ctimer;
 	double timer;
@@ -51,6 +57,10 @@ static void name_keys(client clnt, unsigned key);
 
 static void client_get_game_init(client clnt, ENetPacket * packet);
 
+static void client_get_game_free(client clnt);
+
+static void send_keys(client clnt, int channel);
+
 client client_init(ENetHost * enet_client){
 	client clnt;
 
@@ -68,6 +78,11 @@ client client_init(ENetHost * enet_client){
 	clnt->enet_client = enet_client;
 	clnt->mbuf[1] = '\0';	
 	clnt->mbuf_num = 0;
+
+	clnt->g_keys.lr = 0;
+	clnt->g_keys.ud = 0;
+	clnt->g_keys.t = 0;
+	clnt->g_keys.s = 0;
 
 	return clnt;
 }
@@ -94,6 +109,12 @@ void client_update(client clnt, double dt){
 	clnt->mbuf[clnt->mbuf_num] = clnt->ctimer < 0.5 ? '|' : ' '; 
 	if(clnt->ctimer > 1)
 		{clnt->ctimer = 0;}
+	if(clnt->c_game != NULL){
+		arena_update_client(clnt->c_game, dt);
+	}
+	if(clnt->game_state != LOBBY){
+		send_keys(clnt, 3);
+	}
 }
 
 void client_render(client clnt){
@@ -139,7 +160,7 @@ void client_render(client clnt){
 			if(clnt->timer > 0 ){
 				//draw timer here.
 				char buf[5];
-				sprintf(buf, "%.1f", clnt->timer);
+				sprintf(buf, "%.0f", clnt->timer + 0.5);
 				glPushMatrix();
 				glLoadIdentity();
 				renderBitmapString(glutGet(GLUT_WINDOW_WIDTH)/2, glutGet(GLUT_WINDOW_HEIGHT)/2, GLUT_BITMAP_HELVETICA_18, buf);
@@ -166,6 +187,48 @@ void client_keys(client clnt, unsigned char key){
 	}
 }
 
+void client_rkeys(client clnt, unsigned char key){
+	switch(key){
+		case 'a':
+			clnt->g_keys.s = 0;
+			break;
+	}
+}
+
+void client_skeys(client clnt, int key){
+	switch(key) {
+		case GLUT_KEY_LEFT : 
+			clnt->g_keys.lr = -1;
+			break;
+		case GLUT_KEY_RIGHT : 
+			clnt->g_keys.lr =  1;
+			break;
+		case GLUT_KEY_UP : 
+			clnt->g_keys.ud =  1;
+			break;
+		case GLUT_KEY_DOWN : 
+			clnt->g_keys.ud = -1;
+			break;
+	}
+}
+
+void client_rskeys(client clnt, int key){
+	switch (key) {
+		case GLUT_KEY_LEFT :
+			if(clnt->g_keys.lr<0){clnt->g_keys.lr=0;}
+			break;
+		case GLUT_KEY_RIGHT : 
+			if(clnt->g_keys.lr>0){clnt->g_keys.lr=0;}
+			break;
+		case GLUT_KEY_UP :
+			if(clnt->g_keys.ud>0){clnt->g_keys.ud=0;}
+			break;
+		case GLUT_KEY_DOWN :
+			if(clnt->g_keys.ud<0){clnt->g_keys.ud=0;}
+			break;
+	}
+}
+
 void client_process_packets(client clnt, ENetEvent *event){
 	switch(event->channelID){
 			case 0:
@@ -182,10 +245,11 @@ void client_process_packets(client clnt, ENetEvent *event){
 				chat_add_message(clnt->c_chat, "Server", "Someone left");
 				break;
 			case 4:
-				arena_get_update(clnt->c_game, event->packet);
+				if(clnt->c_game != NULL)
+					{arena_get_update(clnt->c_game, event->packet);}
 				break;
 			case 5:
-				//TODO: write this function: client_get_game_free(clnt);
+				client_get_game_free(clnt);
 				break;
 	}
 }
@@ -224,9 +288,21 @@ static void normal_keys(client clnt, unsigned key){
 	ENetPacket * packet;
 	switch(key){
 		case ' ':
-			clnt->mbuf[clnt->mbuf_num] = '\0';
-			packet = enet_packet_create (clnt->mbuf, strlen (clnt->mbuf) + 1, ENET_PACKET_FLAG_RELIABLE);
-			enet_peer_send (clnt->enet_server, 2, packet);
+			if(clnt->game_state == LOBBY){
+				clnt->mbuf[clnt->mbuf_num] = '\0';
+				packet = enet_packet_create (clnt->mbuf, strlen (clnt->mbuf) + 1, ENET_PACKET_FLAG_RELIABLE);
+				enet_peer_send (clnt->enet_server, 2, packet);
+			}
+			break;
+		case 'a':
+			if(clnt->game_state != LOBBY){
+				clnt->g_keys.s = 1;
+			}
+			break;
+		case 's':
+			if(clnt->game_state != LOBBY){
+				clnt->g_keys.t = clnt->g_keys.t ? 0 : 1;
+			}
 			break;
 		case 'M':
 		case 'm':
@@ -379,7 +455,30 @@ static void client_get_game_init(client clnt, ENetPacket * packet){
 	clnt->c_game = arena_init(ply_num, 0, x_bd, y_bd);
 }
 
+static void client_get_game_free(client clnt){
+	if(clnt->c_game != NULL){
+		arena_free(clnt->c_game);
+		clnt->c_game = NULL;
+	}
+	clnt->game_state = LOBBY;
+}
 
+static void send_keys(client clnt, int channel){
+	tpl_node *tn;
+	void *addr;
+	size_t len;
+	
+	tronkeys tmp = clnt->g_keys;
 
-
+	tn = tpl_map("cccc", &tmp.lr, &tmp.ud, &tmp.t, &tmp.s);
+	tpl_pack(tn, 0);
+	tpl_dump(tn, TPL_MEM, &addr, &len);
+	tpl_free(tn);
+	
+	//send the package to the server
+	ENetPacket * packet;
+	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send (clnt->enet_server, channel, packet);
+	free(addr);
+}
 

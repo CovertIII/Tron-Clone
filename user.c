@@ -194,7 +194,7 @@ void user_render(user usr){
 				break;
 		}
 
-		sprintf(buf, "%.2d: %s    %s", cycle->ui.id, cycle->ui.name, status);	
+		sprintf(buf, "%.2d: %s    %s  %d", cycle->ui.id, cycle->ui.name, status, cycle->ui.score);	
 		glPushMatrix();
 		glLoadIdentity();
 		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
@@ -426,6 +426,16 @@ void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet
 		}
 	}
 	return;
+}
+
+
+int user_peer_aid(user usr, ENetPeer * peer){
+	usernode * cycle;
+	for(cycle = usr->head; cycle != NULL; cycle = cycle->next){
+		if(cycle->ui.peer == peer){
+			return cycle->ui.arena_plyr_id;
+		}
+	}
 }
 
 static void renderBitmapString(

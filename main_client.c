@@ -37,11 +37,21 @@ int init_network(void){
        exit (EXIT_FAILURE);
    }
    tclient = client_init(enet_client);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	
+	
 }
 
 
 void processNormalKeys(unsigned char key, int xx, int yy) {
 	client_keys(tclient, key);
+}
+
+void releaseNormalKeys(unsigned char key, int xx, int yy) {
+	client_rkeys(tclient, key);
 }
 
 
@@ -83,6 +93,7 @@ void display(void) {
 }
 
 void pressKey(int key, int xx, int yy) {
+	client_skeys(tclient, key);
 	switch(key) {
 		case GLUT_KEY_LEFT : 
 			movin.x=-1;
@@ -100,6 +111,7 @@ void pressKey(int key, int xx, int yy) {
 }
 
 void releaseKey(int key, int xx, int yy) {
+	client_rskeys(tclient, key);
 	switch (key) {
 		case GLUT_KEY_LEFT :
 			if(movin.x<0){movin.x=0;}
@@ -154,6 +166,7 @@ int main(int argc, char** argv)
     glutIdleFunc(idle);
     
 	glutKeyboardFunc(processNormalKeys);
+	glutKeyboardUpFunc(releaseNormalKeys);
     glutMainLoop();
 	client_free(tclient);
    	enet_host_destroy(enet_client);

@@ -197,7 +197,7 @@ void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel){
 	tpl_free(tn);
 	
 	ENetPacket * packet;
-	packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+	packet = enet_packet_create (addr, len, 0);
 	enet_host_broadcast (host, channel, packet);
 	free(addr);
 }
@@ -211,11 +211,18 @@ void player_get_update(player *actors, ENetPacket * packet){
 	tpl_unpack(tn,0); 
 	tpl_free(tn);
 
+	int tt = actors[plyr_id]->trailtoggle;
 	traillist tmp_trail = actors[plyr_id]->trails;
 	particles tmp_part = actors[plyr_id]->ghost;
 
 	*actors[plyr_id] = splyr;
 	actors[plyr_id]->trails = tmp_trail;
 	actors[plyr_id]->ghost = tmp_part;
+
+	if(tt != actors[plyr_id]->trailtoggle){
+		actors[plyr_id]->trailtoggle = tt;
+		player_toggle(actors[plyr_id]);
+	}
+
 }
 

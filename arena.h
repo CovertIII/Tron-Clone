@@ -21,6 +21,7 @@ arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd);
  */
 void arena_update(arena arna, double dt);
 
+void arena_update_client(arena arna, double dt);
 
 /**** arena_render: *****
  * On Entry: nothing

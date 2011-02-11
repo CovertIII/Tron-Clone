@@ -20,6 +20,8 @@ void server_send_gm_init(server svr, double timer, int ply_num, int x_bd, int y_
 
 void server_send_gm_free(server svr, enet_uint8 channel);
 
+static void get_keys(server svr, ENetEvent * event);
+
 typedef struct servertype{
 	int game_state;
 	ENetHost * enet_server;
@@ -92,7 +94,7 @@ void server_update(server svr, double dt){
 				int winner_id; //= arena_winner(svr->s_game);
 				user_update_score(svr->s_users, winner_id, 1);
 				svr->game_state = POSTGAME;
-				svr->timer = 2.0f;
+				svr->timer = 20.0f;
 				//TODO:  Let clients know the winner name and that we are in a POSTGAME state now.
 			}
 			break;
@@ -106,6 +108,7 @@ void server_update(server svr, double dt){
 				svr->game_state = LOBBY;
 				user_all_not_ready(svr->s_users);
 				server_send_gm_free(svr, 5);
+				user_send_list(svr->s_users, svr->enet_server, 1);
 				//TODO: Let clients know that we are in the lobby now.
 				//TODO: send all user data to clients to ensure the games are in snyc.
 			}
@@ -116,7 +119,6 @@ void server_update(server svr, double dt){
 
 void server_process_packet(server svr, ENetEvent event){
 	ENetPacket * packet;
-	printf("Channel Limit %d\n", svr->enet_server->channelLimit);
 	switch(event.channelID){
 			case 0:
 				user_send_chat_message(svr->s_users, &event, svr->enet_server, 0);
@@ -126,6 +128,14 @@ void server_process_packet(server svr, ENetEvent event){
 				break;
 			case 2:
 				user_sget_send_pstate(svr->s_users, svr->enet_server,  &event, 1);
+				break;
+			case 3:
+				if((svr->game_state == GAME || svr->game_state == POSTGAME) &&
+					svr->s_game != NULL){
+					get_keys(svr, &event);
+				}
+				break;
+
 	}
 }
 
@@ -150,5 +160,37 @@ void server_send_gm_free(server svr, enet_uint8 channel){
 	ENetPacket * packet;
 	packet = enet_packet_create ("HI", sizeof("Hi"+1), ENET_PACKET_FLAG_RELIABLE);
 	enet_host_broadcast (svr->enet_server, channel, packet);
+}
+
+static void get_keys(server svr, ENetEvent * event){
+	tpl_node *tn;
+	void *addr;
+	size_t len;
+	
+	int id;
+	char lr, ud, t, s;
+
+	tn = tpl_map("cccc", &lr, &ud, &t, &s);
+	tpl_load(tn, TPL_MEM, event->packet->data, event->packet->dataLength);
+	tpl_unpack(tn, 0);
+	tpl_free(tn);
+	
+	id = user_peer_aid(svr->s_users, event->peer);
+
+	if (lr == -1)
+		{s ? arena_ply_turn(svr->s_game, id, 7) : arena_ply_turn(svr->s_game, id, 3);}
+	else if (lr == 1)
+		{s ? arena_ply_turn(svr->s_game, id, -7) : arena_ply_turn(svr->s_game, id, -3);}
+	else if (lr == 0)
+		{ arena_ply_turn(svr->s_game, id, 0);}
+	if (ud == -1)
+		{arena_ply_speed(svr->s_game, id, -500);}
+	else if (ud == 1)
+		{arena_ply_speed(svr->s_game, id,  500);}
+	else if (ud == 0)
+		{arena_ply_speed(svr->s_game, id, 0);}
+
+	if (t)
+		{arena_plyr_tg(svr->s_game, id);}
 }
 
