@@ -45,7 +45,7 @@ traillist.o: traillist.c traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c traillist.c
 
 player.o: player.c player.h traillist.h particle_sys.h plist.h collison.h vector2.h
-	$(CC) $(CFLAGS) $(NETLIBS)	-c player.c
+	$(CC) $(CFLAGS) -c player.c
 
 arena.o: arena.c arena.h traillist.h plist.h collison.h vector2.h
 	$(CC) $(CFLAGS) -c arena.c
@@ -54,13 +54,13 @@ chat.o: chat.c chat.h
 	$(CC) $(CFLAGS) -c chat.c
 
 user.o: user.c user.h
-	$(CC) $(CFLAGS) $(NETLIBS) -c user.c
+	$(CC) $(CFLAGS) -c user.c
 
 server.o: server.c server.h user.h chat.h arena.h
-	$(CC) $(CFLAGS) $(NETLIBS) -c server.c
+	$(CC) $(CFLAGS) -c server.c
 
 client.o: client.c client.h user.h chat.h arena.h
-	$(CC) $(CFLAGS) $(NETLIBS) -c client.c
+	$(CC) $(CFLAGS) -c client.c
 
 clean:
 	\rm *.o

@@ -63,6 +63,16 @@ int arena_player_status(arena arna){
 	return num;
 }
 
+int arena_winner(arena arna){
+	int i;
+	for(i=0; i < arna->plyr_nm; i++){
+		if(!player_status(arna->actors[i]))
+			{return i;}
+	}
+}
+
+
+
 void arena_update(arena arna, double dt){
 	int i;
 	for(i=0; i<arna->plyr_nm; i++){

@@ -170,7 +170,7 @@ void user_render(user usr){
 	int i = 0;
 	usernode *cycle = usr->head;
 	char buf[50];
-	sprintf(buf, "%d users:", usr->user_num);	
+	sprintf(buf, "User     Score    Status    Ping");	
 	glPushMatrix();
 	glLoadIdentity();
 	renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-40, GLUT_BITMAP_HELVETICA_10, buf);
@@ -194,10 +194,16 @@ void user_render(user usr){
 				break;
 		}
 
-		sprintf(buf, "%.2d: %s    %s  %d", cycle->ui.id, cycle->ui.name, status, cycle->ui.score);	
 		glPushMatrix();
 		glLoadIdentity();
+		sprintf(buf, "%s", cycle->ui.name);	
 		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		sprintf(buf, "%d", cycle->ui.score);	
+		renderBitmapString(60, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		sprintf(buf, "%s", status);	
+		renderBitmapString(80, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		sprintf(buf, "%d", cycle->ui.ping);	
+		renderBitmapString(150, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();
 		cycle = cycle->next;
 		i++;
@@ -262,8 +268,15 @@ void user_all_not_ready(user usr){
 }
 
 void user_send_list(user usr, ENetHost * host, int channel){
+	//sets the ping to the right amount
+	usernode *cycle = usr->head;
+	while(cycle != NULL){
+		cycle->ui.ping = cycle->ui.peer->roundTripTime;
+		cycle = cycle->next;
+	}
+	
+	//functino as normal
 	user_info ui_p;
-	usernode *cycle;
 	tpl_node *tn;
 	void *addr;
 	size_t len;

@@ -94,42 +94,11 @@ void display(void) {
 
 void pressKey(int key, int xx, int yy) {
 	client_skeys(tclient, key);
-	switch(key) {
-		case GLUT_KEY_LEFT : 
-			movin.x=-1;
-			break;
-		case GLUT_KEY_RIGHT : 
-			movin.x= 1;
-			break;
-		case GLUT_KEY_UP : 
-			movin.y= 1;
-			break;
-		case GLUT_KEY_DOWN : 
-			movin.y=-1;
-			break;
-	}
 }
 
 void releaseKey(int key, int xx, int yy) {
 	client_rskeys(tclient, key);
-	switch (key) {
-		case GLUT_KEY_LEFT :
-			if(movin.x<0){movin.x=0;}
-			break;
-		case GLUT_KEY_RIGHT : 
-			if(movin.x>0){movin.x=0;}
-			break;
-		case GLUT_KEY_UP :
-			if(movin.y>0){movin.y=0;}
-			break;
-		case GLUT_KEY_DOWN :
-			if(movin.y<0){movin.y=0;}
-			break;
-		default:
-			break;
-	}
 }
-
 
 void reshape(int width, int height)
 {

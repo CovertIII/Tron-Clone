@@ -29,12 +29,14 @@ typedef struct servertype{
 	chat s_chat;
 	user s_users;
 	double timer;
+	double update_timer;
 } servertype;
 
 server server_init(ENetHost * enet_server){
 	server svr;
 	svr = (server)malloc(sizeof(servertype));
 	svr->game_state = LOBBY;
+	svr->update_timer = 0.0f;
 	svr->s_users = user_init(); 
 	svr->enet_server = enet_server;
 	svr->s_chat = chat_init();
@@ -65,11 +67,16 @@ void server_remove_user(server svr, ENetPeer *peer){
 	user_send_disconnect(id, 3, svr->enet_server);
 }
 void server_update(server svr, double dt){
+	svr->update_timer += dt;
+	if(svr->update_timer > 3){
+		svr->update_timer = 0.0f;
+		user_send_list(svr->s_users, svr->enet_server, 1);
+	}
 	switch(svr->game_state){
 		case LOBBY:
 			if(svr->s_users != NULL && user_number(svr->s_users) > 0 && user_check_states(svr->s_users) == 0){
 				svr->game_state = PREGAME;
-				svr->timer = 5.0f;
+				svr->timer = 3.0f;
 				int ply_num = user_set_arena_id(svr->s_users);
 				svr->s_game = arena_init(ply_num, 0, 800, 600);
 				// let the client know that we are switching to the pregame state
@@ -83,24 +90,20 @@ void server_update(server svr, double dt){
 			arena_send_update(svr->s_game, svr->enet_server, 4);
 			if(svr->timer < 0){
 				svr->game_state = GAME;
-				//TODO: let clients know we are in game state now.
 			}
 			break;
 		case GAME:
 			arena_update(svr->s_game, dt);
 			arena_send_update(svr->s_game, svr->enet_server, 4);
-			//TODO: send the game updates here. (if someone dies send that info, put don't send the particle system)
 			if(arena_player_status(svr->s_game) <= 1){
-				int winner_id; //= arena_winner(svr->s_game);
+				int winner_id = arena_winner(svr->s_game);
 				user_update_score(svr->s_users, winner_id, 1);
 				svr->game_state = POSTGAME;
 				svr->timer = 5.0f;
-				//TODO:  Let clients know the winner name and that we are in a POSTGAME state now.
 			}
 			break;
 		case POSTGAME:
 			arena_update(svr->s_game, dt);
-			//TODO: send game updates here as well.
 			arena_send_update(svr->s_game, svr->enet_server, 4);
 			svr->timer -= dt;
 			if(svr->timer < 0){
@@ -109,8 +112,6 @@ void server_update(server svr, double dt){
 				user_all_not_ready(svr->s_users);
 				server_send_gm_free(svr, 5);
 				user_send_list(svr->s_users, svr->enet_server, 1);
-				//TODO: Let clients know that we are in the lobby now.
-				//TODO: send all user data to clients to ensure the games are in snyc.
 			}
 			break;
 	}
