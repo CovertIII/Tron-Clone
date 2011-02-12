@@ -94,7 +94,7 @@ void server_update(server svr, double dt){
 				int winner_id; //= arena_winner(svr->s_game);
 				user_update_score(svr->s_users, winner_id, 1);
 				svr->game_state = POSTGAME;
-				svr->timer = 20.0f;
+				svr->timer = 5.0f;
 				//TODO:  Let clients know the winner name and that we are in a POSTGAME state now.
 			}
 			break;

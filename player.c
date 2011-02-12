@@ -212,6 +212,8 @@ void player_get_update(player *actors, ENetPacket * packet){
 	tpl_free(tn);
 
 	int tt = actors[plyr_id]->trailtoggle;
+	int dd = actors[plyr_id]->dead;
+
 	traillist tmp_trail = actors[plyr_id]->trails;
 	particles tmp_part = actors[plyr_id]->ghost;
 
@@ -222,6 +224,12 @@ void player_get_update(player *actors, ENetPacket * packet){
 	if(tt != actors[plyr_id]->trailtoggle){
 		actors[plyr_id]->trailtoggle = tt;
 		player_toggle(actors[plyr_id]);
+	}
+
+	if (dd != actors[plyr_id]->dead){
+		vector2 tmp1 = {-actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, -actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
+		vector2 tmp2 = { actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
+		actors[plyr_id]->ghost = particles_init(tmp1, tmp2, actors[plyr_id]->v);
 	}
 
 }
