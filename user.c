@@ -193,6 +193,7 @@ void user_render(user usr){
 				strcpy(status, "Waiting");
 				break;
 		}
+		glColor3f((float)i/(float)usr->user_num,0.2,1-(float)i/(float)usr->user_num);
 
 		glPushMatrix();
 		glLoadIdentity();
