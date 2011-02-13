@@ -82,6 +82,9 @@ void chat_render(chat cht, int type){
 		glPopMatrix();
 		free(buf);
 		cycle = cycle->next;
+		if(type && i > 3){
+			return;
+		}
 		++i;
 	}	
 }

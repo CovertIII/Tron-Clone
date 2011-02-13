@@ -150,6 +150,23 @@ void player_toggle(player plyr){
 	}
 }
 
+void player_trail_on(player plyr){
+	if(plyr->trailtoggle == 1){
+		return;
+	}
+	plyr->trailtoggle = 1;
+	trail_on(plyr->trails);
+}	
+
+void player_trail_off(player plyr){
+	if(plyr->trailtoggle == 0){
+		return;
+	}
+	plyr->trailtoggle = 0;
+	trail_off(plyr->trails);
+}
+
+
 void player_render(player plyr){
 	particles_render(plyr->ghost);
 	if(plyr->dead == 0){

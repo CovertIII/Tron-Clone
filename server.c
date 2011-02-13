@@ -30,6 +30,7 @@ typedef struct servertype{
 	user s_users;
 	double timer;
 	double update_timer;
+	int t;
 } servertype;
 
 server server_init(ENetHost * enet_server){
@@ -40,6 +41,7 @@ server server_init(ENetHost * enet_server){
 	svr->s_users = user_init(); 
 	svr->enet_server = enet_server;
 	svr->s_chat = chat_init();
+	svr->t = 0;
 	return svr;
 }
 
@@ -190,8 +192,6 @@ static void get_keys(server svr, ENetEvent * event){
 		{arena_ply_speed(svr->s_game, id,  500);}
 	else if (ud == 0)
 		{arena_ply_speed(svr->s_game, id, 0);}
-
-	if (t)
-		{arena_plyr_tg(svr->s_game, id);}
+	t ? arena_plyr_t_off(svr->s_game, id) : arena_plyr_t_on(svr->s_game, id);
 }
 

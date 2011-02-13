@@ -106,10 +106,19 @@ void arena_update_client(arena arna, double dt){
 void arena_render(arena arna){
 	int i;
 	for (i=0; i < arna->plyr_nm; i++){
-
 		glColor3f((float)i/(float)arna->plyr_nm,0.2,1-(float)i/(float)arna->plyr_nm);
 		player_render(arna->actors[i]);
 	}
+	glPushMatrix();
+	glLineWidth(3.0);
+	glColor3f(1,1,1);	
+	glBegin(GL_LINE_LOOP);
+		glVertex2f(0,0);
+		glVertex2f(0, arna->bd.y);
+		glVertex2f(arna->bd.x, arna->bd.y);
+		glVertex2f(arna->bd.x, 0);
+	glEnd();
+
 }
 
 int arena_ply_turn(arena arna, int plyr_id, int dir){
@@ -127,6 +136,18 @@ int arena_ply_speed(arena arna, int plyr_id, int a){
 int arena_plyr_tg(arena arna, int plyr_id){
 	if(arna->plyr_nm > plyr_id){
 		player_toggle(arna->actors[plyr_id]);
+	}
+}
+
+void arena_plyr_t_on(arena arna, int plyr_id){
+	if(arna->plyr_nm > plyr_id){
+		player_trail_on(arna->actors[plyr_id]);
+	}
+}
+
+void arena_plyr_t_off(arena arna, int plyr_id){
+	if(arna->plyr_nm > plyr_id){
+		player_trail_off(arna->actors[plyr_id]);
 	}
 }
 

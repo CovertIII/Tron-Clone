@@ -51,6 +51,9 @@ int arena_ply_speed(arena arna, int plyr_id, int a);
  */
 int arena_plyr_tg(arena arna, int plyr_id);
 
+void arena_plyr_t_on(arena arna, int plyr_id);
+void arena_plyr_t_off(arena arna, int plyr_id);
+
 /**** arena_free: *****
  * On Entry: arna is and intialised arna
  * On Exit: frees up all the memory used by an arena

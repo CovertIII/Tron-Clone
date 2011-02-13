@@ -36,6 +36,10 @@ void player_speed(player plyr, int a);
 /**** player_toggle: ****/
 void player_toggle(player plyr);
 
+void player_trail_off(player plyr);
+
+void player_trail_on(player plyr);
+
 /**** player_render: ****/
 void player_render(player plyr);
 

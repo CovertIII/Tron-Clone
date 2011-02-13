@@ -250,6 +250,7 @@ void client_process_packets(client clnt, ENetEvent *event){
 				break;
 			case 5:
 				client_get_game_free(clnt);
+				clnt->g_keys.t = 0;
 				break;
 	}
 }
