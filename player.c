@@ -84,6 +84,11 @@ int player_ck_bd(player plyr, int x, int y){
 	vector2 c3 = {x,y};
 	vector2 c4 = {x,0};
 
+	particles_bound(plyr->ghost, x, y);
+
+	if(plyr->dead)
+		{return 0;}
+
 	vector2 t1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
 
@@ -96,6 +101,9 @@ int player_ck_bd(player plyr, int x, int y){
 
 int player_ck_self(player plyr){
 	
+	if(plyr->dead)
+		{return 0;}
+
 	vector2 t1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
 	
@@ -107,6 +115,9 @@ int player_ck_self(player plyr){
 
 int player_ck_plyr(player plyr_hd, player plyr_tl){
 	
+	if(plyr_hd->dead && plyr_tl->dead)
+		{return 0;}
+
 	vector2 hd1 = {-plyr_hd->length*cos(plyr_hd->th)+plyr_hd->p.x, -plyr_hd->length*sin(plyr_hd->th)+plyr_hd->p.y};
 	vector2 hd2 = { plyr_hd->length*cos(plyr_hd->th)+plyr_hd->p.x,  plyr_hd->length*sin(plyr_hd->th)+plyr_hd->p.y};
 	vector2 tl1 = {-plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x, -plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};

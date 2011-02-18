@@ -1,15 +1,41 @@
-Tron Game
-========
-This is going to be a tron clone.  Before this game, I had just
-learned about memory managment with C.  I made this game to practice
-using memory managment and a little bit of absract data type.  I
-plan on to have it networked.  So in the future there will be a
-server and client.  Right now I am still working on the game logic.
-Mess around with this if you would like to.  It is not really 
-playable now.
+Tron-Clone Game
+===============
+This is a Tron Clone Game.  Drive you "cycle" around while
+trying to avoid the trails made by yourself other players. 
 
-There are three executables made by the project: tron, tserver, 
-tclient.  tron is a program to test the game; it is a two player 
-game, but you will have to share the same keyboard to play.  The 
-server, tserver, is a server to host a multiplayer game played over
-a LAN.  tclient is the client.  The multiplayer aspect isn't done yet.
+Install
+=======
+Right now the game is built for Mac OS X v10.6.  If you
+have that you should be able to run the binaries with no
+problem.  If not, you have to build it from source. The game
+uses GLUT, enet, and tpl libraries.  Find them and install
+them.  After that, if you on a Mac, just run the 'make' command and it should 
+work.  If you're on a linux machine you'll have to change source 
+headers from <GLUT/GLUT.h> to three seperate headers.  Then change
+the flags in the makefile to the correct flags.  On windows 
+look into MinGW to compile it. 
+
+Gameplay
+========
+There are three binaries: tron, tserver, and tclient.  
+
+tron: This is a two player game on the same machine.  Fist player uses
+	the arrow keys to move and the second uses the 'w', 'a', 's', 'd' 
+	keys to move. 
+
+tserver: This starts a tron server where many people can play
+	the tron game over a LAN.
+
+tclient:  This is the client to play against different people connected 
+	the tserver.  When it start you must enter in the name or IP address
+	of the server.  If you want to host a game you must start the tserver
+	progam first, then type localhost or 127.0.0.1 or ::1 to connect to
+	your server.  If other people want to play they must type the IP
+	address of your computer on your network.
+
+	Once connected push the space bar to indicate you are ready.  While 
+	playing use the arrow keys to move yourself around.  Up and down make
+	you go faster and slower.  'a' will make you power slide and 's' will 
+	toggle your trail on or off.
+
+

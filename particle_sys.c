@@ -23,8 +23,8 @@ particles particles_init(vector2 pt1, vector2 pt2, vector2 v){
 	particlenode *cycle;
 	particlenode *prev = NULL;	
 
-	int i;
-	for(i=0; i<=length; i++){
+	float i;
+	for(i=0; i<=length; i += 0.1f){
 		cycle = (particles)malloc(sizeof(particlenode));
 		//if cycle is null free the memory allocated already, then make pts NULL;
 		if(i==0)
@@ -45,7 +45,6 @@ void particles_update(particles pts, float dt){
 	if(pts == NULL)
 		{return;}
 	particlenode *cycle = pts;
-	particlenode *prev = NULL;
 	while(cycle != NULL){
 		cycle->p.v.x += (-cycle->p.v.x)*dt;
 		cycle->p.v.y += (-cycle->p.v.y)*dt;
@@ -54,12 +53,34 @@ void particles_update(particles pts, float dt){
 		cycle->p.t -= dt;
 		if(cycle->p.t <= 0){
 			cycle->p.t = 0;
-			cycle = cycle->next;
 		}
-		else{
-			prev = cycle;
-			cycle = cycle->next;
+		cycle = cycle->next;
+	}
+}
+
+
+void particles_bound(particles pts, int x, int y){
+	if(pts == NULL)
+		{return;}
+	particlenode *cycle = pts;
+	while(cycle != NULL){
+		if(cycle->p.p.x < 0){
+			cycle->p.p.x = 0;
+			cycle->p.v.x = -cycle->p.v.x;
 		}
+		if(cycle->p.p.x > x){
+			cycle->p.p.x = x;
+			cycle->p.v.x = -cycle->p.v.x;
+		}
+		if(cycle->p.p.y < 0){
+			cycle->p.p.y = 0;
+			cycle->p.v.y = -cycle->p.v.y;
+		}
+		if(cycle->p.p.y > y){
+			cycle->p.p.y = y;
+			cycle->p.v.y = -cycle->p.v.y;
+		}
+		cycle = cycle->next;
 	}
 }
 
@@ -69,7 +90,7 @@ void particles_render(particles pts){
 	particlenode *cycle = pts;
 	float c[4];
 	glGetFloatv(GL_CURRENT_COLOR, &c); 
-	glPointSize(3);	
+	glPointSize(2);	
 
 	glPushMatrix();
 	glBegin(GL_POINTS);
