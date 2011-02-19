@@ -166,14 +166,14 @@ void user_free(user usr){
 	free(usr);
 }	
 
-void user_render(user usr){
+void user_render(user usr, int x, int y){
 	int i = 0;
 	usernode *cycle = usr->head;
 	char buf[50];
 	sprintf(buf, "User     Score    Status    Ping");	
 	glPushMatrix();
 	glLoadIdentity();
-	renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-40, GLUT_BITMAP_HELVETICA_10, buf);
+	renderBitmapString(10, y-40, GLUT_BITMAP_HELVETICA_10, buf);
 	glPopMatrix();
 
 	while(cycle != NULL){
@@ -198,13 +198,13 @@ void user_render(user usr){
 		glPushMatrix();
 		glLoadIdentity();
 		sprintf(buf, "%s", cycle->ui.name);	
-		renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(10, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		sprintf(buf, "%d", cycle->ui.score);	
-		renderBitmapString(60, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(60, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		sprintf(buf, "%s", status);	
-		renderBitmapString(80, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(80, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		sprintf(buf, "%d", cycle->ui.ping);	
-		renderBitmapString(150, glutGet(GLUT_WINDOW_HEIGHT)-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(150, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();
 		cycle = cycle->next;
 		i++;

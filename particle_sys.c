@@ -24,7 +24,7 @@ particles particles_init(vector2 pt1, vector2 pt2, vector2 v){
 	particlenode *prev = NULL;	
 
 	float i;
-	for(i=0; i<=length; i += 0.1f){
+	for(i=0; i<=length; i += 1.0f){
 		cycle = (particles)malloc(sizeof(particlenode));
 		//if cycle is null free the memory allocated already, then make pts NULL;
 		if(i==0)
@@ -90,7 +90,7 @@ void particles_render(particles pts){
 	particlenode *cycle = pts;
 	float c[4];
 	glGetFloatv(GL_CURRENT_COLOR, &c); 
-	glPointSize(2);	
+	glPointSize(3);	
 
 	glPushMatrix();
 	glBegin(GL_POINTS);

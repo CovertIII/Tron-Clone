@@ -101,15 +101,18 @@ void arena_update_client(arena arna, double dt){
 	int i;
 	for(i=0; i<arna->plyr_nm; i++){
 		player_update(arna->actors[i], dt);
+		player_ck_bd(arna->actors[i], arna->bd.x, arna->bd.y);
 	}
 }
 void arena_render(arena arna){
+	glPushMatrix();
+	double t =  0.5f * (glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT) * arna->bd.y - arna->bd.x);
+	glTranslatef(t + arna->bd.x*0.1, arna->bd.y*0.1, 0);
 	int i;
 	for (i=0; i < arna->plyr_nm; i++){
 		glColor3f((float)i/(float)arna->plyr_nm,0.2,1-(float)i/(float)arna->plyr_nm);
 		player_render(arna->actors[i]);
 	}
-	glPushMatrix();
 	glLineWidth(3.0);
 	glColor3f(1,1,1);	
 	glBegin(GL_LINE_LOOP);
@@ -118,7 +121,7 @@ void arena_render(arena arna){
 		glVertex2f(arna->bd.x, arna->bd.y);
 		glVertex2f(arna->bd.x, 0);
 	glEnd();
-
+	glPopMatrix();
 }
 
 int arena_ply_turn(arena arna, int plyr_id, int dir){

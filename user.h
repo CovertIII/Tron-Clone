@@ -29,6 +29,8 @@ int user_add(user usr, ENetPeer *peer, int status);
  */
 int user_remove(user usr, ENetPeer *peer);
 
+void user_render(user usr, int x, int y);
+
 /* user_free:
  * entry: takes the user list to free,
  * exit:  deletes list

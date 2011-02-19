@@ -179,9 +179,9 @@ void player_trail_off(player plyr){
 
 
 void player_render(player plyr){
+	glPushMatrix();
 	particles_render(plyr->ghost);
 	if(plyr->dead == 0){
-		glPushMatrix();
 		glLineWidth(3.0);
 	
 		glBegin(GL_LINES);

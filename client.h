@@ -20,4 +20,6 @@ void client_rskeys(client clnt, int key);
 
 void client_process_packets(client clnt, ENetEvent * event);
 
+vector2 clnt_gm_size(client clnt);
+
 void client_free(client clnt);

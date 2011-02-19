@@ -31,6 +31,7 @@ typedef struct tronkeys{
 typedef struct clienttype{
 	ENetPeer * enet_server;
 	ENetHost * enet_client;
+	vector2 w;
 	int game_state;
 	int game_mode;
 	arena c_game;
@@ -73,6 +74,8 @@ client client_init(ENetHost * enet_client){
 	clnt->c_game = NULL;
 	clnt->c_chat = chat_init();
 	clnt->c_users = user_init();	
+	clnt->w.x = 800;
+	clnt->w.y = 600;
 	clnt->timer = 0;
 	clnt->ctimer = 0;
 	clnt->enet_client = enet_client;
@@ -124,33 +127,33 @@ void client_render(client clnt){
 		case NOT_CONNECTED:	
 			glPushMatrix();
 			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 15, GLUT_BITMAP_HELVETICA_10, "Please enter the server you would like to connect to:\0");
+			renderBitmapString(10, clnt->w.y - 15, GLUT_BITMAP_HELVETICA_10, "Please enter the server you would like to connect to:\0");
 			glPopMatrix();
 			glPushMatrix();
 			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT)- 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
+			renderBitmapString(10, clnt->w.y- 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
 			glPopMatrix();
 			break;
 		case MESSAGE:
 			glPopMatrix();
 			glPushMatrix();
 			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 15, GLUT_BITMAP_HELVETICA_10, "Message: ");
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
+			renderBitmapString(10, clnt->w.y - 15, GLUT_BITMAP_HELVETICA_10, "Message: ");
+			renderBitmapString(10, clnt->w.y - 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
 			glPopMatrix();
 			break;
 		case NAME:
 			glPushMatrix();
 			glLoadIdentity();
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 15, GLUT_BITMAP_HELVETICA_10, "What would you like your name to be?");
-			renderBitmapString(10, glutGet(GLUT_WINDOW_HEIGHT) - 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
+			renderBitmapString(10, clnt->w.y - 15, GLUT_BITMAP_HELVETICA_10, "What would you like your name to be?");
+			renderBitmapString(10, clnt->w.y - 27, GLUT_BITMAP_HELVETICA_10, clnt->mbuf);
 			glPopMatrix();
 			break;
 	}
 	switch(clnt->game_state){
 		case LOBBY:
 			chat_render(clnt->c_chat, 0);
-			user_render(clnt->c_users);
+			user_render(clnt->c_users, clnt->w.x, clnt->w.y);
 			break;
 		case GAME:
 		case POSTGAME:
@@ -159,11 +162,13 @@ void client_render(client clnt){
 			chat_render(clnt->c_chat, 1);
 			if(clnt->timer > 0 ){
 				//draw timer here.
+				double ratio = glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT);
+				double wx = ratio * clnt->w.y;
 				char buf[5];
 				sprintf(buf, "%.0f", clnt->timer + 0.5);
 				glPushMatrix();
 				glLoadIdentity();
-				renderBitmapString(glutGet(GLUT_WINDOW_WIDTH)/2, glutGet(GLUT_WINDOW_HEIGHT)/2, GLUT_BITMAP_HELVETICA_18, buf);
+				renderBitmapString(wx/2, clnt->w.y/2, GLUT_BITMAP_HELVETICA_18, buf);
 				glPopMatrix();
 			}
 			break;
@@ -348,6 +353,10 @@ static void normal_keys(client clnt, unsigned key){
 	}
 }
 
+vector2 clnt_gm_size(client clnt){
+	return clnt->w;
+}
+
 static void message_keys(client clnt, unsigned key){
 	ENetPacket * packet;
 	ENetAddress address;
@@ -454,6 +463,15 @@ static void client_get_game_init(client clnt, ENetPacket * packet){
 	clnt->game_state = PREGAME;
 	clnt->timer = timer;
 	clnt->c_game = arena_init(ply_num, 0, x_bd, y_bd);
+	clnt->w.x = x_bd*1.2f;
+	clnt->w.y = y_bd*1.2f;
+	
+	double ratio = glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT);
+	double wx = ratio * clnt->w.y;
+	glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, wx, 0, clnt->w.y);
+    glMatrixMode(GL_MODELVIEW);
 }
 
 static void client_get_game_free(client clnt){
