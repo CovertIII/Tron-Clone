@@ -24,6 +24,8 @@ int sharp2=0;
 float timer = 0;
 int game_state;
 int player_num;
+int xbd = 800;
+int ybd = 600;
 
 arena mygame;
 
@@ -56,7 +58,7 @@ void init(int argc, char** argv)
 	else
 		{sscanf(argv[1],"%d",&player_num);}
 	game_state = GAME;	
-	mygame = arena_init(player_num,0, windowWidth, windowHeight);
+	mygame = arena_init(player_num,0, xbd, ybd);
 }
 
 void numbers(int value){
@@ -114,7 +116,7 @@ void numbers(int value){
 
 				int windowWidth = glutGet(GLUT_WINDOW_WIDTH);
 				int windowHeight = glutGet(GLUT_WINDOW_HEIGHT);
-				mygame = arena_init(player_num,0, windowWidth, windowHeight);
+				mygame = arena_init(player_num,0, xbd, ybd);
 
 				game_state = GAME;
 			}
@@ -289,10 +291,15 @@ void reshape(int width, int height)
 {
     glViewport(0, 0, width, height);
 	
+	double ratio = glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT);
+	vector2 w;
+	w.x = xbd*1.2;
+	w.y = ybd*1.2;
+
+	double wx = ratio * w.y;
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(0, width, 0, height);
-    glMatrixMode(GL_MODELVIEW);
+    gluOrtho2D(0, wx, 0, w.y);
 }
 
 void idle(void)

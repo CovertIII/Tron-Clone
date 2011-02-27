@@ -73,7 +73,7 @@ void player_update(player plyr, double dt){
 
 	particles_update(plyr->ghost, dt);
 	
-	vector2 tmp = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
+	vector2 tmp = {-1*(plyr->length+1)*cos(plyr->th)+plyr->p.x, -1*(plyr->length+1)*sin(plyr->th)+plyr->p.y};
 	
 	traillist_update(plyr->trails, tmp, dt);	
 }
@@ -106,8 +106,10 @@ int player_ck_self(player plyr){
 
 	vector2 t1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
-	
-	if(traillist_intersect(plyr->trails, t1, t2, 1)){
+	//There is a bug in checking the trails.  It appears as if you can go through the last segment of any trail.  That
+	//is because when you turn a trail off it does not update the collision trail to add a point to where you turned it
+	//off.  Therefore you can go through part of the draw trail, which is updated every frame. 	
+	if(traillist_intersect(plyr->trails, t1, t2)){
 		return 1;
 	}
 	return 0;
@@ -123,7 +125,7 @@ int player_ck_plyr(player plyr_hd, player plyr_tl){
 	vector2 tl1 = {-plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x, -plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	vector2 tl2 = { plyr_tl->length*cos(plyr_tl->th)+plyr_tl->p.x,  plyr_tl->length*sin(plyr_tl->th)+plyr_tl->p.y};
 	
-	if(traillist_intersect(plyr_tl->trails, hd1, hd2, 0)){
+	if(traillist_intersect(plyr_tl->trails, hd1, hd2)){
 		return 1;
 	}
 	if(line_collison(hd1, hd2, tl1, tl2) && plyr_tl->dead == 0 && plyr_hd->dead == 0){

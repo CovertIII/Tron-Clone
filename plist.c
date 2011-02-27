@@ -63,19 +63,17 @@ int plist_update(plist list, float dt){
 	return 0;
 }
 
-int plist_intersect(plist list, vector2 g1, vector2 g2, int line1){
+int plist_intersect(plist list, vector2 g1, vector2 g2){
 	if(list == NULL)
 		{return 0;}
-	pnode *cycle = (line1)?(list->next):(list);
-	if(cycle == NULL)
-		{return 0;}
+	pnode *cycle = list;
 	pnode *nxt = cycle->next;
-	
+
 	while(nxt != NULL){		
-		if(line_collison(g1, g2, nxt->pt.p, cycle->pt.p) && nxt->pt.t > 0.5){
+		if(line_collison(g1, g2, cycle->pt.p, nxt->pt.p) && nxt->pt.t > 0.5){
 			return 1;
 		}
-		cycle = cycle->next;
+		cycle = nxt;
 		nxt = nxt->next;
 	}
 	return 0;

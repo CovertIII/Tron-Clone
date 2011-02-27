@@ -109,15 +109,14 @@ void traillist_render(traillist tlist){
 	}
 }
 
-int traillist_intersect(traillist tlist, vector2 g1, vector2 g2, int line1){
+int traillist_intersect(traillist tlist, vector2 g1, vector2 g2){
 	if(tlist->firsttrail == NULL){
 		return 0;
 	}
 	trailnode *cycle = tlist->firsttrail;
 	while(cycle != NULL){
-		if(plist_intersect(cycle->t.col_trail, g1, g2, line1))
+		if(plist_intersect(cycle->t.col_trail, g1, g2))
 			{return 1;}
-		line1 = 0;
 		cycle = cycle->next;
 	}
 	return 0;

@@ -6,6 +6,6 @@ int plist_update(plist list, float dt);
 
 void plist_render(plist list);
 
-int plist_intersect(plist list, vector2 g1, vector2 g2, int line1);
+int plist_intersect(plist list, vector2 g1, vector2 g2);
 
 void plist_free(plist list);
