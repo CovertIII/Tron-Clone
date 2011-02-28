@@ -14,6 +14,10 @@ typedef struct arenatype *arena;
 */
 arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd);
 
+void arena_init_sound(arena arna);
+void arena_free_sound(arena arna);
+
+void arena_set_my_id(arena arna, int id);
 
 /**** arena_update: *****
  * On Entry: the time increment at which to increase the world.

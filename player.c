@@ -1,6 +1,8 @@
-#include <GLUT/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <GLUT/glut.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include <enet/enet.h>
 #include <tpl.h>
 
@@ -57,6 +59,14 @@ player player_init(int x, int y, double th){
 
 int player_status(player plyr){
 	return plyr->dead;
+}
+
+vector2 player_pos(player plyr){
+	return plyr->p; 
+}
+
+vector2 player_vel(player plyr){
+	return plyr->v;
 }
 
 void player_update(player plyr, double dt){
@@ -232,7 +242,7 @@ void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel){
 	free(addr);
 }
 
-void player_get_update(player *actors, ENetPacket * packet){
+void player_get_update(player *actors, ENetPacket * packet, ALuint die, ALuint buz){
 	int plyr_id;
 	playertype splyr;
 	tpl_node * tn;

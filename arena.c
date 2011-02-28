@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <enet/enet.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include "vector2.h"
+#include "sound_list.h"
 #include "player.h"
 #include "arena.h"
 
@@ -12,6 +15,14 @@ typedef struct arenatype {
 	int AI_nm;
 	vector2 bd;
 	player *actors;
+
+	int myid;
+	ALuint buf_engine;
+	ALuint buf_trail;
+	ALuint buf_death;
+	ALuint *src_engine;
+	ALuint *src_trail;
+	s_list death;
 } arenatype;
 
 arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd){
@@ -51,6 +62,54 @@ arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd){
 		arna->plyr_nm++;
 	}
 	return arna;
+}
+
+void arena_set_my_id(arena arna, int id){
+	arna->myid = id;
+}
+
+void arena_init_sound(arena arna){
+	arna->src_engine = (ALuint*)malloc(sizeof(ALuint)*arna->plyr_nm);
+	arna->src_trail = (ALuint*)malloc(sizeof(ALuint)*arna->plyr_nm);
+	
+	alGenBuffers(1, &arna->buf_engine);
+	alGenBuffers(1, &arna->buf_trail);
+
+	snd_load_file("./sound_data/motor.ogg", arna->buf_engine);
+	snd_load_file("./sound_data/electric.ogg", arna->buf_trail);
+
+	alGenSources(arna->plyr_nm,  arna->src_engine);
+	alGenSources(arna->plyr_nm,  arna->src_trail);
+	int i;
+	for(i=0; i<arna->plyr_nm; i++){
+		alSourcei(arna->src_engine[i], AL_BUFFER, arna->buf_engine);
+		alSourcei(arna->src_trail[i], AL_BUFFER, arna->buf_trail);
+
+		alSourcei(arna->src_engine[i], AL_LOOPING, AL_TRUE);
+		alSourcei(arna->src_trail[i], AL_LOOPING, AL_TRUE);
+		
+		vector2 pos;
+	   	pos = player_pos(arna->actors[i]);
+		vector2 vel;
+	   	vel = player_vel(arna->actors[i]);
+		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
+		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
+		alSourcePlay(arna->src_engine[i]);
+	}
+	
+	vector2 pos = player_pos(arna->actors[arna->myid]);
+	vector2 vel = player_vel(arna->actors[arna->myid]);
+	ALfloat	listenerOri[]={0.0,1.0,0.0, 0.0,0.0,1.0};
+	alListenerfv(AL_ORIENTATION,listenerOri);
+	alListener3f(AL_POSITION, pos.x, 0, pos.y);
+	alListener3f(AL_VELOCITY, vel.x, 0, vel.y);
+}
+
+void arena_free_sound(arena arna){
+	alDeleteSources(arna->plyr_nm,  arna->src_engine);
+	alDeleteSources(arna->plyr_nm,  arna->src_trail);
+	alDeleteBuffers(1, &arna->buf_engine);
+	alDeleteBuffers(1, &arna->buf_trail);
 }
 
 int arena_player_status(arena arna){
@@ -102,7 +161,19 @@ void arena_update_client(arena arna, double dt){
 	for(i=0; i<arna->plyr_nm; i++){
 		player_update(arna->actors[i], dt);
 		player_ck_bd(arna->actors[i], arna->bd.x, arna->bd.y);
+
+		vector2 pos = player_pos(arna->actors[i]);
+		vector2 vel = player_vel(arna->actors[i]);
+		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
+		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
 	}
+
+	vector2 pos = player_pos(arna->actors[arna->myid]);
+	vector2 vel = player_vel(arna->actors[arna->myid]);
+	ALfloat	listenerOri[]={0.0,1.0,0.0, 0.0,0.0,1.0};
+	alListenerfv(AL_ORIENTATION,listenerOri);
+	alListener3f(AL_POSITION, pos.x, pos.y, 0);
+	alListener3f(AL_VELOCITY, vel.x, vel.y, 0);
 }
 void arena_render(arena arna){
 	glPushMatrix();
@@ -175,6 +246,7 @@ void arena_send_update(arena arna, ENetHost * enet_server, int channel){
 
 
 void arena_get_update(arena arna, ENetPacket * packet){
-	player_get_update(arna->actors, packet);
+	ALuint a,b;
+	player_get_update(arna->actors, packet, a, b);
 }
 

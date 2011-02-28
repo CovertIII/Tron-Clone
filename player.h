@@ -18,6 +18,10 @@ void player_die(player plyr);
 /**** player_status (returns 0 if player is alive, and one if he is dead) ***/
 int player_status(player plyr);
 
+vector2 player_pos(player plyr);
+
+vector2 player_vel(player plyr);
+
 /*** player_ck_bd: ***/
 int player_ck_bd(player plyr, int x, int y);
 
@@ -49,4 +53,5 @@ void player_free(player plyr);
 
 void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel);
 
-void player_get_update(player *actors, ENetPacket * packet);
+void player_get_update(player *actors, ENetPacket * packet, ALuint die, ALuint buz);
+

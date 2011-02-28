@@ -442,6 +442,36 @@ void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet
 	return;
 }
 
+void user_send_arena_ids(user usr, int channel){
+	usernode * cycle;
+	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
+		int id_p = cycle->ui.arena_plyr_id;
+		tpl_node *tn;
+		void *addr;
+		size_t len;
+
+		tn = tpl_map("i", &id_p);
+		tpl_pack(tn, 0);
+		tpl_dump(tn, TPL_MEM, &addr, &len);
+		tpl_free(tn);
+		
+		ENetPacket * packet;
+		packet = enet_packet_create (addr, len, ENET_PACKET_FLAG_RELIABLE);
+		enet_peer_send (cycle->ui.peer, channel, packet);
+		free(addr);
+	}
+}
+
+int user_get_arena_id(ENetPacket * packet){
+	int id;
+	tpl_node * tn;
+	tn = tpl_map("i", &id);
+	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
+	tpl_unpack(tn, 0);
+	tpl_free(tn);
+
+	return id;
+}
 
 int user_peer_aid(user usr, ENetPeer * peer){
 	usernode * cycle;

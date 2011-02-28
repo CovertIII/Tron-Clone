@@ -114,3 +114,7 @@ void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet
 
 int user_peer_aid(user usr, ENetPeer * peer);
 
+void user_send_arena_ids(user usr, int channel);
+
+int user_get_arena_id(ENetPacket * packet);
+

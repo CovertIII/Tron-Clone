@@ -3,6 +3,8 @@
 #include <string.h>
 #include <math.h>
 #include <GLUT/glut.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include <enet/enet.h>
 #include "vector2.h"
 #include "client.h"
@@ -11,18 +13,37 @@ vector2 movin = {0,0};
 
 int lastFrameTime = 0;
 
+ALCdevice * device;
+ALCcontext * context;
+ALenum error;
+
 ENetHost * enet_client;
 ENetAddress address;
 ENetEvent event;
 client tclient;
 
-int init_network(void){
+void alCleanUp(void){
+	context = alcGetCurrentContext();
+	device = alcGetContextsDevice(context);
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);
+}
+
+int init(void){
+	device = alcOpenDevice(NULL);
+	if(device) {
+		context = alcCreateContext(device, NULL);
+	}
+	alcMakeContextCurrent(context);
+
 	if (enet_initialize () != 0)
     {
         fprintf (stderr, "An error occurred while initializing ENet.\n");
         return EXIT_FAILURE;
     }
 	atexit (enet_deinitialize);
+	atexit (alCleanUp);
 
 	enet_client = enet_host_create (NULL /* create a client host */,
 							   1 /* only allow 1 outgoing connection */,
@@ -30,13 +51,13 @@ int init_network(void){
 							   0 /* 56K modem with 56 Kbps downstream bandwidth */,
 							   0 /* 56K modem with 14 Kbps upstream bandwidth */);
    
-   if (enet_client == NULL)
-   {
-       fprintf (stderr, 
+	if (enet_client == NULL)
+	{
+		fprintf (stderr, 
                 "An error occurred while trying to create an ENet client host.\n");
-       exit (EXIT_FAILURE);
-   }
-   tclient = client_init(enet_client);
+		exit (EXIT_FAILURE);
+	}
+	tclient = client_init(enet_client);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_POINT_SMOOTH);
@@ -127,7 +148,7 @@ int main(int argc, char** argv)
   
   glutCreateWindow("Tron Clone Client");
 	
-	init_network();
+	init();
 	
 	glutIgnoreKeyRepeat(1);
 	glutSpecialFunc(pressKey);

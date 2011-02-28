@@ -85,6 +85,7 @@ void server_update(server svr, double dt){
 				//       and to set its timer to the server pregame timer.
 				//       tell the client to init an arena with the ply_num (AI currently not implemented)
 				server_send_gm_init(svr, svr->timer, ply_num, 800, 600, 2);
+				user_send_arena_ids(svr->s_users, 6);
 			}
 			break;
 		case PREGAME:

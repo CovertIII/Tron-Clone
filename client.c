@@ -4,7 +4,10 @@
 #include <GLUT/GLUT.h>
 #include <tpl.h>
 #include <enet/enet.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
 #include "vector2.h"
+#include "sound_list.h"
 #include "arena.h"
 #include "chat.h"
 #include "user.h"
@@ -37,11 +40,16 @@ typedef struct clienttype{
 	arena c_game;
 	chat c_chat;
 	user c_users;
+
 	char mbuf[500];
 	tronkeys g_keys;
 	int mbuf_num;
+
 	double ctimer;
 	double timer;
+
+	ALuint key_buf;
+	s_list key_click;
 } clienttype;
 
 static int get_input(client clnt, unsigned char key);
@@ -86,7 +94,10 @@ client client_init(ENetHost * enet_client){
 	clnt->g_keys.ud = 0;
 	clnt->g_keys.t = 0;
 	clnt->g_keys.s = 0;
-
+	
+	alGenBuffers(1, &clnt->key_buf);
+	snd_load_file("./sound_data/click2.ogg", clnt->key_buf);
+	clnt->key_click = s_init(clnt->key_buf);
 	return clnt;
 }
 
@@ -100,6 +111,7 @@ void client_disconnect(client clnt){
 	user_free(clnt->c_users);
 	clnt->c_users = user_init();
 	if(clnt->c_game != NULL){
+		arena_free_sound(clnt->c_game);
 		arena_free(clnt->c_game);
 		clnt->c_game = NULL;
 	}
@@ -107,6 +119,7 @@ void client_disconnect(client clnt){
 }
 
 void client_update(client clnt, double dt){
+	s_update(clnt->key_click);
 	clnt->ctimer += dt;
 	clnt->timer -= dt;
 	clnt->mbuf[clnt->mbuf_num] = clnt->ctimer < 0.5 ? '|' : ' '; 
@@ -235,9 +248,12 @@ void client_rskeys(client clnt, int key){
 }
 
 void client_process_packets(client clnt, ENetEvent *event){
+	vector2 pos; pos.x = 0; pos.y = 0;
+	int id;
 	switch(event->channelID){
 			case 0:
 				user_get_chat_message(clnt->c_users, clnt->c_chat, event->packet);
+				s_add_snd(clnt->key_click, pos);
 				break;
 			case 1:
 				user_get_list(clnt->c_users, event->packet);
@@ -248,6 +264,7 @@ void client_process_packets(client clnt, ENetEvent *event){
 			case 3:
 				user_get_disconnect(clnt->c_users, event->packet);
 				chat_add_message(clnt->c_chat, "Server", "Someone left");
+				s_add_snd(clnt->key_click, pos);
 				break;
 			case 4:
 				if(clnt->c_game != NULL)
@@ -256,6 +273,11 @@ void client_process_packets(client clnt, ENetEvent *event){
 			case 5:
 				client_get_game_free(clnt);
 				clnt->g_keys.t = 0;
+				break;
+			case 6:
+				id = user_get_arena_id(event->packet);
+				arena_set_my_id(clnt->c_game, id);
+				arena_init_sound(clnt->c_game);
 				break;
 	}
 }
@@ -339,7 +361,9 @@ static void normal_keys(client clnt, unsigned key){
 					   		printf("You left the server.\n");
 							chat_add_message(clnt->c_chat, "Client", "You left the server.  Push <esc> again to exit the game");
 							clnt->game_state = LOBBY;
-							if(clnt->c_game != NULL) {arena_free(clnt->c_game);}
+							if(clnt->c_game != NULL) {
+								arena_free_sound(clnt->c_game);
+								arena_free(clnt->c_game);}
 							clnt->c_game = NULL;
 			        	return;
 			    	}
@@ -476,6 +500,7 @@ static void client_get_game_init(client clnt, ENetPacket * packet){
 
 static void client_get_game_free(client clnt){
 	if(clnt->c_game != NULL){
+		arena_free_sound(clnt->c_game);
 		arena_free(clnt->c_game);
 		clnt->c_game = NULL;
 	}
