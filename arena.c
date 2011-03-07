@@ -96,13 +96,12 @@ void arena_init_sound(arena arna){
 		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
 		alSourcePlay(arna->src_engine[i]);
 	}
-	
 	vector2 pos = player_pos(arna->actors[arna->myid]);
 	vector2 vel = player_vel(arna->actors[arna->myid]);
 	ALfloat	listenerOri[]={0.0,1.0,0.0, 0.0,0.0,1.0};
 	alListenerfv(AL_ORIENTATION,listenerOri);
-	alListener3f(AL_POSITION, pos.x, 0, pos.y);
-	alListener3f(AL_VELOCITY, vel.x, 0, vel.y);
+	alListener3f(AL_POSITION, pos.x, pos.y, 0);
+	alListener3f(AL_VELOCITY, vel.x, vel.y, 0);
 }
 
 void arena_free_sound(arena arna){
@@ -170,10 +169,8 @@ void arena_update_client(arena arna, double dt){
 
 	vector2 pos = player_pos(arna->actors[arna->myid]);
 	vector2 vel = player_vel(arna->actors[arna->myid]);
-	ALfloat	listenerOri[]={0.0,1.0,0.0, 0.0,0.0,1.0};
-	alListenerfv(AL_ORIENTATION,listenerOri);
-	alListener3f(AL_POSITION, pos.x, pos.y, 0);
-	alListener3f(AL_VELOCITY, vel.x, vel.y, 0);
+	alListener3f(AL_POSITION, pos.x, pos.y, 10);
+	alListener3f(AL_VELOCITY, vel.x, vel.y, 10);
 }
 void arena_render(arena arna){
 	glPushMatrix();

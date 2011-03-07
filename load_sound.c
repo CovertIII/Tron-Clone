@@ -23,7 +23,7 @@ int snd_load_file(char const * file, ALuint buffer){
 	{
 		fclose(oggFile);
 		printf("Could not open Ogg stream.\n");
-		exit(0);
+		return 0;
 	}
 
 	vorbisInfo = ov_info(&oggStream, -1);
@@ -80,5 +80,6 @@ int snd_load_file(char const * file, ALuint buffer){
 	alBufferData(buffer, format, dyn_data, size, vorbisInfo->rate);
 	free(dyn_data);
 	ov_clear(&oggStream);
+	return 1;
 }
 
