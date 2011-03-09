@@ -16,6 +16,10 @@ ENetAddress address;
 ENetEvent event;
 client tclient;
 
+void clean_up(void){
+	client_free(tclient);
+}
+
 int init_network(void){
 	if (enet_initialize () != 0)
     {
@@ -24,6 +28,7 @@ int init_network(void){
     }
 	atexit (enet_deinitialize);
 
+	atexit (clean_up);
 	enet_client = enet_host_create (NULL /* create a client host */,
 							   1 /* only allow 1 outgoing connection */,
 							   0 /* allow up 4 channels to be used, 0 and 1 */,

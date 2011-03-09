@@ -15,3 +15,5 @@ void server_send_updates(server svr);
 
 void server_process_packet(server svr, ENetEvent event);
 
+void server_free(server svr);
+

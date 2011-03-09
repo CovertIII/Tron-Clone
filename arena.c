@@ -56,6 +56,8 @@ arena arena_init(int plyr_nm, int AI, int x_bd, int y_bd){
 int arena_player_status(arena arna){
 	int i;
 	int num = 0;
+	if(arna->plyr_nm == 1)
+	{num++;}
 	for(i=0; i < arna->plyr_nm; i++){
 		if(!player_status(arna->actors[i]))
 			{num++;}

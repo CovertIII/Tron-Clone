@@ -32,6 +32,7 @@ void arena_render(arena arna);
 /**** arena_player_status ***
  * One Entry: takes an arena
  * on exit: return the number of players alive in the arena
+ * (if the total number of players is 1, returns 2)
  */
 int arena_player_status(arena arna);
 

@@ -117,6 +117,16 @@ int user_remove_id(user usr, int id){
 	usr->user_num--;
 	return id;
 }
+
+char * user_nameby_id(user usr, int id){
+	usernode *cycle = usr->head;
+	while(cycle != NULL){
+		if(cycle->ui.id == id)
+			{return cycle->ui.name;}
+		cycle = cycle->next;
+	}
+}
+
 int user_remove(user usr, ENetPeer *peer){
 	usernode *cycle = usr->head;
 	usernode *prev = NULL;
@@ -348,15 +358,19 @@ void user_send_disconnect(int id, int channel, ENetHost * host){
 	free(addr);
 }
 
-void user_get_disconnect(user usr, ENetPacket * packet){
+void user_get_disconnect(user usr, ENetPacket * packet, chat cht){
 	tpl_node * tn;
 	int id_p;
 	tn = tpl_map("i", &id_p);
 	tpl_load(tn, TPL_MEM, packet->data, packet->dataLength);
 	tpl_unpack(tn, 0);
 	tpl_free(tn);
-
+	
+	char * name = user_nameby_id(usr, id_p);
 	user_remove_id(usr, id_p);
+	char buf[200];
+	sprintf(buf, "%s left the server", name);
+	chat_add_message(cht, "Server", buf); 
 }
 	
 void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel){
