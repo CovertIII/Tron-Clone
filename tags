@@ -11,11 +11,14 @@ arena_init	arena.c	/^arena arena_init(int plyr_nm, int AI, int x_bd, in/
 arena_player_status	arena.c	/^int arena_player_status(arena arna){$/
 arena_ply_speed	arena.c	/^int arena_ply_speed(arena arna, int plyr_id, int a/
 arena_ply_turn	arena.c	/^int arena_ply_turn(arena arna, int plyr_id, int di/
+arena_plyr_t_off	arena.c	/^void arena_plyr_t_off(arena arna, int plyr_id){$/
+arena_plyr_t_on	arena.c	/^void arena_plyr_t_on(arena arna, int plyr_id){$/
 arena_plyr_tg	arena.c	/^int arena_plyr_tg(arena arna, int plyr_id){$/
 arena_render	arena.c	/^void arena_render(arena arna){$/
 arena_send_update	arena.c	/^void arena_send_update(arena arna, ENetHost * enet/
 arena_update	arena.c	/^void arena_update(arena arna, double dt){$/
 arena_update_client	arena.c	/^void arena_update_client(arena arna, double dt){$/
+arena_winner	arena.c	/^int arena_winner(arena arna){$/
 arenatype	arena.c	/^} arenatype;$/
 chat	chat.h	/^typedef struct chattype * chat;$/
 chat_add_message	chat.c	/^int chat_add_message(chat cht, char *name, char *m/
@@ -25,6 +28,7 @@ chat_init	chat.c	/^chat chat_init(void){$/
 chat_node	chat.c	/^} chat_node;$/
 chat_render	chat.c	/^void chat_render(chat cht, int type){$/
 chattype	chat.c	/^} chattype;$/
+clean_up	main_client.c	/^void clean_up(void){$/
 client	client.h	/^typedef struct clienttype * client;$/
 client_connect	client.c	/^void client_connect(client clnt){$/
 client_connection	client.c	/^int client_connection(client clnt){$/
@@ -41,8 +45,11 @@ client_rskeys	client.c	/^void client_rskeys(client clnt, int key){$/
 client_skeys	client.c	/^void client_skeys(client clnt, int key){$/
 client_update	client.c	/^void client_update(client clnt, double dt){$/
 clienttype	client.c	/^} clienttype;$/
+clnt_gm_size	client.c	/^vector2 clnt_gm_size(client clnt){$/
+disconnect_peers	server.c	/^static void disconnect_peers(ENetHost *host){$/
 display	main.c	/^void display(void) {$/
 get_input	client.c	/^static int get_input(client clnt, unsigned char ke/
+get_keys	server.c	/^static void get_keys(server svr, ENetEvent * event/
 getthetime	main_server.c	/^unsigned long int getthetime()$/
 idle	main.c	/^void idle(void)$/
 init	main.c	/^void init(int argc, char** argv)$/
@@ -57,6 +64,7 @@ not_connected_keys	client.c	/^static void not_connected_keys(client clnt, unsign
 numbers	main.c	/^void numbers(int value){$/
 particlenode	particle_sys.c	/^} particlenode;$/
 particles	particle_sys.h	/^typedef struct particlenode *particles;$/
+particles_bound	particle_sys.c	/^void particles_bound(particles pts, int x, int y){/
 particles_free	particle_sys.c	/^void particles_free(particles pts){$/
 particles_init	particle_sys.c	/^particles particles_init(vector2 pt1, vector2 pt2,/
 particles_render	particle_sys.c	/^void particles_render(particles pts){$/
@@ -75,12 +83,15 @@ player_send_update	player.c	/^void player_send_update(player plyr, int plyr_id, 
 player_speed	player.c	/^void player_speed(player plyr, int a){$/
 player_status	player.c	/^int player_status(player plyr){$/
 player_toggle	player.c	/^void player_toggle(player plyr){$/
+player_trail_off	player.c	/^void player_trail_off(player plyr){$/
+player_trail_on	player.c	/^void player_trail_on(player plyr){$/
 player_turn	player.c	/^void player_turn(player plyr, int dir){$/
 player_update	player.c	/^void player_update(player plyr, double dt){$/
 playertype	player.c	/^} playertype;$/
 plist	plist.h	/^typedef struct pnode *plist;$/
 plist_add	plist.c	/^int plist_add(plist *list, vector2 p){$/
 plist_free	plist.c	/^void plist_free(plist list){$/
+plist_head	plist.c	/^int plist_head(plist *list, vector2 p){$/
 plist_intersect	plist.c	/^int plist_intersect(plist list, vector2 g1, vector/
 plist_render	plist.c	/^void plist_render(plist list){$/
 plist_update	plist.c	/^int plist_update(plist list, float dt){$/
@@ -95,8 +106,12 @@ reshape	main.c	/^void reshape(int width, int height)$/
 send_keys	client.c	/^static void send_keys(client clnt, int channel){$/
 server	server.h	/^typedef struct servertype *server;$/
 server_add_user	server.c	/^void server_add_user(server svr, ENetPeer *peer){$/
+server_free	server.c	/^void server_free(server svr){$/
 server_init	server.c	/^server server_init(ENetHost * enet_server){$/
+server_process_packet	server.c	/^void server_process_packet(server svr, ENetEvent e/
 server_remove_user	server.c	/^void server_remove_user(server svr, ENetPeer *peer/
+server_send_gm_free	server.c	/^void server_send_gm_free(server svr, enet_uint8 ch/
+server_send_gm_init	server.c	/^void server_send_gm_init(server svr, double timer,/
 server_update	server.c	/^void server_update(server svr, double dt){$/
 servertype	server.c	/^} servertype;$/
 trail_free	traillist.c	/^void trail_free(traillist tlist){$/
@@ -123,11 +138,12 @@ user_get_disconnect	user.c	/^void user_get_disconnect(user usr, ENetPacket * pa/
 user_get_list	user.c	/^void user_get_list(user usr, ENetPacket * packet){/
 user_info	user.c	/^} user_info;$/
 user_init	user.c	/^user user_init(void){$/
+user_nameby_id	user.c	/^char * user_nameby_id(user usr, int id){$/
 user_number	user.c	/^int user_number(user usr){$/
 user_peer_aid	user.c	/^int user_peer_aid(user usr, ENetPeer * peer){$/
 user_remove	user.c	/^int user_remove(user usr, ENetPeer *peer){$/
 user_remove_id	user.c	/^int user_remove_id(user usr, int id){$/
-user_render	user.c	/^void user_render(user usr){$/
+user_render	user.c	/^void user_render(user usr, int x, int y){$/
 user_send_chat_message	user.c	/^void user_send_chat_message(user usr, ENetEvent * /
 user_send_disconnect	user.c	/^void user_send_disconnect(int id, int channel, ENe/
 user_send_list	user.c	/^void user_send_list(user usr, ENetHost * host, int/

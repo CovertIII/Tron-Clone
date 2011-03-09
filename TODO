@@ -1,0 +1,13 @@
+TODO list for Trial Blazer
+Tue Mar  8 23:50:01 EST 2011
+Short term goals
+ 1. Announce the winner after the game.  (or tie if there was one)
+ 2. Allow a player to make himself idle, so as not to participte in the following rounds.
+ 3. Have a player idle after a minute of inactivity.
+
+Long Term Goals:
+ 1. Change player shape (insead of a line, maybe a rombus)
+ 2. Add sound.
+ 3. have a make install in the Makefile.
+ 4. Make is a mac application bundle
+ 5. Port to linux and windows.
