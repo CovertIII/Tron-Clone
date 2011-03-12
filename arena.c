@@ -114,6 +114,8 @@ void arena_free_sound(arena arna){
 int arena_player_status(arena arna){
 	int i;
 	int num = 0;
+	if(arna->plyr_nm == 1)
+	{num++;}
 	for(i=0; i < arna->plyr_nm; i++){
 		if(!player_status(arna->actors[i]))
 			{num++;}

@@ -38,6 +38,29 @@ int plist_add(plist *list, vector2 p){
 	return 0;
 }
 
+int plist_head(plist *list, vector2 p){
+	if(*list == NULL){	
+		pnode *new_node;
+		
+		new_node = (pnode*)malloc(sizeof(pnode));
+		if(new_node==NULL)
+			{return 1;}
+		new_node->pt.p = p;
+		new_node->pt.t = 10.1f;
+		new_node->next = NULL;
+		
+		if(*list == NULL){
+			*list = new_node;
+			return 0;
+		}
+		
+		new_node->next = *list;
+		*list = new_node;
+		return 0;
+	}
+	(*list)->pt.p = p;
+}
+
 int plist_update(plist list, float dt){
 	pnode *cycle = list;
 	pnode *prev = NULL;

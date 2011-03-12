@@ -16,6 +16,12 @@ server tronserver;
 
 unsigned long int getthetime();
 
+void clean_up(void){
+	printf("Cleaning up resources used for tserver");
+	server_free(tronserver);
+	enet_host_destroy(enetserver);
+}
+
 int main (int argc, char ** argv){
 	prev = getthetime();
 
@@ -25,7 +31,7 @@ int main (int argc, char ** argv){
 	}
 
 	atexit (enet_deinitialize);
-	
+		
 
 	address.host = ENET_HOST_ANY;
 	address.port = 5001;
@@ -42,7 +48,7 @@ int main (int argc, char ** argv){
 	}
 
 	tronserver = server_init(enetserver);
-	
+	atexit(clean_up);
 	printf("This is the TronClone Server.\nPush ^c to kill the server.\n");
 
     /* Main game loop */
@@ -78,8 +84,7 @@ int main (int argc, char ** argv){
 		server_update(tronserver, h);
 		prev = now;
 	}
- 
-	enet_host_destroy(enetserver);
+	clean_up(); 
 }
 
 unsigned long int getthetime()

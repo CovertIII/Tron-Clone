@@ -262,9 +262,8 @@ void client_process_packets(client clnt, ENetEvent *event){
 				client_get_game_init(clnt, event->packet);
 				break;
 			case 3:
-				user_get_disconnect(clnt->c_users, event->packet);
-				chat_add_message(clnt->c_chat, "Server", "Someone left");
 				s_add_snd(clnt->key_click, pos);
+				user_get_disconnect(clnt->c_users, event->packet, clnt->c_chat);
 				break;
 			case 4:
 				if(clnt->c_game != NULL)
@@ -283,6 +282,36 @@ void client_process_packets(client clnt, ENetEvent *event){
 }
 
 void client_free(client clnt){
+	ENetEvent event;
+	if(clnt->game_mode != NOT_CONNECTED){
+
+		enet_peer_disconnect (clnt->enet_server, 0);
+	
+		/* Allow up to 3 seconds for the disconnect to succeed
+		and drop any packets received packets.*/
+		int connection = 1;
+		while (enet_host_service (clnt->enet_client, & event, 3000) > 0){
+			switch (event.type){
+				case ENET_EVENT_TYPE_RECEIVE:
+					enet_packet_destroy (event.packet);
+				break;
+	
+				case ENET_EVENT_TYPE_DISCONNECT:
+					if(clnt->c_game != NULL) {arena_free(clnt->c_game);}
+					clnt->c_game = NULL;
+					connection = 0;
+			}
+		}
+	
+		/* We've arrived here, so the disconnect attempt didn't */
+		/* succeed yet.  Force the connection down.             */
+		if(connection)
+			{enet_peer_reset (clnt->enet_server);}
+	}
+	chat_free(clnt->c_chat);
+	user_free(clnt->c_users);
+	if(clnt->c_game != NULL) {arena_free(clnt->c_game);}
+	free(clnt);
 }
 
 int client_connection(client clnt){

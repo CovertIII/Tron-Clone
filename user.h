@@ -104,7 +104,7 @@ void user_send_new_client(user usr, ENetPeer * peer, ENetHost *host, enet_uint8 
 void user_send_disconnect(int id, int channel, ENetHost * host);
 
 /* for the client */
-void user_get_disconnect(user usr, ENetPacket * packet);
+void user_get_disconnect(user usr, ENetPacket * packet, chat cht);
 
 void user_send_chat_message(user usr, ENetEvent * event, ENetHost * host, enet_uint8 channel);
 

@@ -120,6 +120,48 @@ void server_update(server svr, double dt){
 	}
 }
 
+static void disconnect_peers(ENetHost *host){
+	ENetPeer * currentPeer;
+	ENetEvent event;
+	for (currentPeer = host -> peers;
+		 currentPeer < & host -> peers [host -> peerCount];
+		 ++ currentPeer)
+	{
+		int connection = 1;
+
+		enet_peer_disconnect (currentPeer, 0);
+	
+		/* Allow up to 3 seconds for the disconnect to succeed
+		and drop any packets received packets.*/
+		while (enet_host_service (host, & event, 3000) > 0){
+			switch (event.type){
+				case ENET_EVENT_TYPE_RECEIVE:
+					enet_packet_destroy (event.packet);
+				break;
+	
+				case ENET_EVENT_TYPE_DISCONNECT:
+					connection = 0;
+					break;
+			}
+		}
+	
+		/* We've arrived here, so the disconnect attempt didn't */
+		/* succeed yet.  Force the connection down.             */
+		if(connection)
+			{enet_peer_reset (currentPeer);}
+	}
+}
+
+void server_free(server svr){
+	if(svr->s_game != NULL){
+		arena_free(svr->s_game);
+		server_send_gm_free(svr, 5);
+		disconnect_peers(svr->enet_server);	
+	}
+	user_free(svr->s_users);
+	chat_free(svr->s_chat);
+	free(svr);
+}
 
 void server_process_packet(server svr, ENetEvent event){
 	ENetPacket * packet;

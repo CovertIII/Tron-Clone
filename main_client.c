@@ -30,6 +30,10 @@ void alCleanUp(void){
 	alcCloseDevice(device);
 }
 
+void clean_up(void){
+	client_free(tclient);
+}
+
 int init(void){
 	device = alcOpenDevice(NULL);
 	if(device) {
@@ -45,6 +49,7 @@ int init(void){
 	atexit (enet_deinitialize);
 	atexit (alCleanUp);
 
+	atexit (clean_up);
 	enet_client = enet_host_create (NULL /* create a client host */,
 							   1 /* only allow 1 outgoing connection */,
 							   0 /* allow up 4 channels to be used, 0 and 1 */,

@@ -58,6 +58,7 @@ void traillist_update(traillist tlist, vector2 p, float dt){
 			plist_add(&trail->t.col_trail, p);
 			tlist->col_timer = 0;
 		}
+		plist_head(&trail->t.col_trail, p);
 	}	
 
 	/*TODO once you find out that a trail is done,
