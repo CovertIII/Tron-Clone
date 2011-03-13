@@ -51,22 +51,37 @@ void s_add_snd(s_list sl, vector2 p){
 }
 
 void s_update(s_list sl){
-	s_node * cycle;
+	s_node * cycle = sl->head;
 	s_node * prev = NULL;
-	for(cycle = sl->head; cycle != NULL; cycle = cycle->next){
+	while(cycle != NULL){
 		int state;
 		alGetSourcei(cycle->src, AL_SOURCE_STATE, &state);
 		if(state == AL_STOPPED){
 			if(prev == NULL){
-				sl->head = NULL;
+				s_node * tmp = cycle->next;
+				sl->head = tmp;
 				alDeleteSources(1, &cycle->src);
 				free(cycle);
-				break;
+				cycle = tmp;
 			}
-			prev->next = cycle->next;
-			alDeleteSources(1, &cycle->src);
-			free(cycle);
-			cycle = prev->next;
+			else{
+				prev->next = cycle->next;
+				alDeleteSources(1, &cycle->src);
+				free(cycle);
+				cycle = prev->next;
+			}
 		}
+		else{cycle = cycle->next;}
 	}
 }
+
+void s_free(s_list sl){
+	s_node * cycle = sl->head;
+	while(cycle != NULL){
+		s_node * tmp = cycle->next;
+		alDeleteSources(1, &cycle->src);
+		free(cycle);
+		cycle = tmp;
+	}
+}
+

@@ -7,6 +7,7 @@
 #include <tpl.h>
 
 #include "vector2.h"
+#include "sound_list.h"
 #include "player.h"
 #include "math.h"
 #include "traillist.h"
@@ -242,7 +243,7 @@ void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel){
 	free(addr);
 }
 
-void player_get_update(player *actors, ENetPacket * packet, ALuint die, ALuint buz){
+void player_get_update(player *actors, ENetPacket * packet, ALuint * buz, ALuint * eng, s_list death){
 	int plyr_id;
 	playertype splyr;
 	tpl_node * tn;
@@ -264,9 +265,12 @@ void player_get_update(player *actors, ENetPacket * packet, ALuint die, ALuint b
 	if(tt != actors[plyr_id]->trailtoggle){
 		actors[plyr_id]->trailtoggle = tt;
 		player_toggle(actors[plyr_id]);
+		tt ? alSourceStop(buz[plyr_id]) : alSourcePlay(buz[plyr_id]);
 	}
 
 	if (dd != actors[plyr_id]->dead){
+		alSourceStop(eng[plyr_id]);
+		s_add_snd(death, actors[plyr_id]->p);
 		vector2 tmp1 = {-actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, -actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
 		vector2 tmp2 = { actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
 		actors[plyr_id]->ghost = particles_init(tmp1, tmp2, actors[plyr_id]->v);

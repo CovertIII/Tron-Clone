@@ -53,5 +53,5 @@ void player_free(player plyr);
 
 void player_send_update(player plyr, int plyr_id, ENetHost * host, int channel);
 
-void player_get_update(player *actors, ENetPacket * packet, ALuint die, ALuint buz);
+void player_get_update(player *actors, ENetPacket * packet, ALuint * buz, ALuint * eng, s_list death);
 

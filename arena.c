@@ -74,9 +74,13 @@ void arena_init_sound(arena arna){
 	
 	alGenBuffers(1, &arna->buf_engine);
 	alGenBuffers(1, &arna->buf_trail);
+	alGenBuffers(1, &arna->buf_death);
 
 	snd_load_file("./sound_data/motor.ogg", arna->buf_engine);
 	snd_load_file("./sound_data/electric.ogg", arna->buf_trail);
+	snd_load_file("./sound_data/die.ogg", arna->buf_death);
+
+	arna->death = s_init(arna->buf_death);
 
 	alGenSources(arna->plyr_nm,  arna->src_engine);
 	alGenSources(arna->plyr_nm,  arna->src_trail);
@@ -95,6 +99,9 @@ void arena_init_sound(arena arna){
 		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
 		alSourcePlay(arna->src_engine[i]);
+		alSource3f(arna->src_trail[i], AL_POSITION, pos.x, pos.y, 0);
+		alSource3f(arna->src_trail[i], AL_VELOCITY, vel.x, vel.y, 0);
+		alSourcePlay(arna->src_trail[i]);
 	}
 	vector2 pos = player_pos(arna->actors[arna->myid]);
 	vector2 vel = player_vel(arna->actors[arna->myid]);
@@ -105,6 +112,7 @@ void arena_init_sound(arena arna){
 }
 
 void arena_free_sound(arena arna){
+	s_free(arna->death);
 	alDeleteSources(arna->plyr_nm,  arna->src_engine);
 	alDeleteSources(arna->plyr_nm,  arna->src_trail);
 	alDeleteBuffers(1, &arna->buf_engine);
@@ -167,6 +175,8 @@ void arena_update_client(arena arna, double dt){
 		vector2 vel = player_vel(arna->actors[i]);
 		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
+		alSource3f(arna->src_trail[i], AL_POSITION, pos.x, pos.y, 0);
+		alSource3f(arna->src_trail[i], AL_VELOCITY, vel.x, vel.y, 0);
 	}
 
 	vector2 pos = player_pos(arna->actors[arna->myid]);
@@ -246,6 +256,6 @@ void arena_send_update(arena arna, ENetHost * enet_server, int channel){
 
 void arena_get_update(arena arna, ENetPacket * packet){
 	ALuint a,b;
-	player_get_update(arna->actors, packet, a, b);
+	player_get_update(arna->actors, packet, arna->src_trail, arna->src_engine, arna->death);
 }
 
