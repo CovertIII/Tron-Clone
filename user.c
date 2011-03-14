@@ -127,6 +127,15 @@ char * user_nameby_id(user usr, int id){
 	}
 }
 
+char * user_nameby_aid(user usr, int id){
+	usernode *cycle = usr->head;
+	while(cycle != NULL){
+		if(cycle->ui.arena_plyr_id == id)
+			{return cycle->ui.name;}
+		cycle = cycle->next;
+	}
+}
+
 int user_remove(user usr, ENetPeer *peer){
 	usernode *cycle = usr->head;
 	usernode *prev = NULL;

@@ -1,5 +1,8 @@
 /*This is going to control a player object*/
 
+/*Scale value for the openAL*/
+#define ALPscale 1.0f/10.0f
+
 typedef struct playertype *player;
 
 /**** player_init: ****

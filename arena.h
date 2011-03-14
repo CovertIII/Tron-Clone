@@ -28,7 +28,7 @@ void arena_update(arena arna, double dt);
 void arena_update_client(arena arna, double dt);
 
 /**** arena_render: *****
- * On Entry: nothing
+ * On Entry: the arena object 
  * On Exit:  renders the world using opengl
  */
 void arena_render(arena arna);
@@ -39,6 +39,8 @@ void arena_render(arena arna);
  * (if the total number of players is 1, returns 2)
  */
 int arena_player_status(arena arna);
+
+int arena_winner(arena arna);
 
 /*** arena_ply_trn: *****
  * On Entry: player number that's turning, direction you want player to go

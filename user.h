@@ -93,6 +93,10 @@ void user_send_list(user usr, ENetHost * host, int channel);
  */
 void user_get_list(user usr, ENetPacket * packet);
 
+char * user_nameby_id(user usr, int id);
+
+char * user_nameby_aid(user usr, int id);
+
 /* when a client changes their name as it appears on the server */
 /* for the server: usr is user list to modify, packet is the packet recived by the server with a string of the new name, channel is the new channel to send the name change out to.*/
 void user_change_name_send(user usr, ENetHost * server,  ENetEvent * event, enet_uint8 channel);

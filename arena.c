@@ -92,23 +92,25 @@ void arena_init_sound(arena arna){
 		alSourcei(arna->src_engine[i], AL_LOOPING, AL_TRUE);
 		alSourcei(arna->src_trail[i], AL_LOOPING, AL_TRUE);
 		
-		vector2 pos;
-	   	pos = player_pos(arna->actors[i]);
-		vector2 vel;
-	   	vel = player_vel(arna->actors[i]);
+		vector2 pos = v2sMul(ALPscale, player_pos(arna->actors[i]));
+		vector2 vel = v2sMul(ALPscale, player_vel(arna->actors[i]));
+		if(i == arna->myid){
+			alSourcef(arna->src_trail[i], AL_GAIN, 0.8f);
+			alSourcef(arna->src_engine[i], AL_GAIN, 0.8f);
+		}
 		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
-		alSourcePlay(arna->src_engine[i]);
 		alSource3f(arna->src_trail[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_trail[i], AL_VELOCITY, vel.x, vel.y, 0);
 		alSourcePlay(arna->src_trail[i]);
+		alSourcePlay(arna->src_engine[i]);
 	}
-	vector2 pos = player_pos(arna->actors[arna->myid]);
-	vector2 vel = player_vel(arna->actors[arna->myid]);
+	vector2 pos = v2sMul(ALPscale, player_pos(arna->actors[arna->myid]));
+	vector2 vel = v2sMul(ALPscale, player_vel(arna->actors[arna->myid]));
 	ALfloat	listenerOri[]={0.0,1.0,0.0, 0.0,0.0,1.0};
 	alListenerfv(AL_ORIENTATION,listenerOri);
-	alListener3f(AL_POSITION, pos.x, pos.y, 0);
-	alListener3f(AL_VELOCITY, vel.x, vel.y, 0);
+	alListener3f(AL_POSITION, pos.x, pos.y, 10);
+	alListener3f(AL_VELOCITY, vel.x, vel.y, 10);
 }
 
 void arena_free_sound(arena arna){
@@ -137,6 +139,7 @@ int arena_winner(arena arna){
 		if(!player_status(arna->actors[i]))
 			{return i;}
 	}
+	return -1;
 }
 
 
@@ -171,19 +174,20 @@ void arena_update_client(arena arna, double dt){
 		player_update(arna->actors[i], dt);
 		player_ck_bd(arna->actors[i], arna->bd.x, arna->bd.y);
 
-		vector2 pos = player_pos(arna->actors[i]);
-		vector2 vel = player_vel(arna->actors[i]);
+		vector2 pos = v2sMul(ALPscale, player_pos(arna->actors[i]));
+		vector2 vel = v2sMul(ALPscale, player_vel(arna->actors[i]));
 		alSource3f(arna->src_engine[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_engine[i], AL_VELOCITY, vel.x, vel.y, 0);
 		alSource3f(arna->src_trail[i], AL_POSITION, pos.x, pos.y, 0);
 		alSource3f(arna->src_trail[i], AL_VELOCITY, vel.x, vel.y, 0);
 	}
 
-	vector2 pos = player_pos(arna->actors[arna->myid]);
-	vector2 vel = player_vel(arna->actors[arna->myid]);
+	vector2 pos = v2sMul(ALPscale, player_pos(arna->actors[arna->myid]));
+	vector2 vel = v2sMul(ALPscale, player_vel(arna->actors[arna->myid]));
 	alListener3f(AL_POSITION, pos.x, pos.y, 10);
 	alListener3f(AL_VELOCITY, vel.x, vel.y, 10);
 }
+
 void arena_render(arena arna){
 	glPushMatrix();
 	double t =  0.5f * (glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT) * arna->bd.y - arna->bd.x);

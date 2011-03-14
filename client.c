@@ -40,6 +40,7 @@ typedef struct clienttype{
 	arena c_game;
 	chat c_chat;
 	user c_users;
+	char winner[80];
 
 	char mbuf[500];
 	tronkeys g_keys;
@@ -122,10 +123,27 @@ void client_update(client clnt, double dt){
 	s_update(clnt->key_click);
 	clnt->ctimer += dt;
 	clnt->timer -= dt;
+
+	if(clnt->game_state == PREGAME && clnt->timer < 0){
+		clnt->game_state = GAME;
+	}
+	if(clnt->game_state == GAME){
+		int winner_id;
+		if(arena_player_status(clnt->c_game) < 2 ){
+			clnt->game_state = POSTGAME;
+			if((winner_id = arena_winner(clnt->c_game)) >= 0){
+				char * name = user_nameby_aid(clnt->c_users, winner_id);
+				sprintf(clnt->winner, "%s wins!", name);
+			}
+			else {
+				strcpy(clnt->winner, "Tie"); 
+			}
+		}
+	}
 	clnt->mbuf[clnt->mbuf_num] = clnt->ctimer < 0.5 ? '|' : ' '; 
 	if(clnt->ctimer > 1)
 		{clnt->ctimer = 0;}
-	if(clnt->c_game != NULL){
+	if(clnt->c_game != NULL && clnt->game_state != PREGAME){
 		arena_update_client(clnt->c_game, dt);
 	}
 	if(clnt->game_state != LOBBY){
@@ -169,7 +187,19 @@ void client_render(client clnt){
 			user_render(clnt->c_users, clnt->w.x, clnt->w.y);
 			break;
 		case GAME:
+			arena_render(clnt->c_game);
+			chat_render(clnt->c_chat, 1);
+			break;
 		case POSTGAME:
+			arena_render(clnt->c_game);
+			chat_render(clnt->c_chat, 1);
+			double ratio = glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT);
+			double wx = ratio * clnt->w.y;
+			glPushMatrix();
+			glLoadIdentity();
+			renderBitmapString(wx/2, clnt->w.y/2, GLUT_BITMAP_HELVETICA_18, clnt->winner);
+			glPopMatrix();
+			break;
 		case PREGAME:
 			arena_render(clnt->c_game);
 			chat_render(clnt->c_chat, 1);
@@ -361,8 +391,8 @@ static void normal_keys(client clnt, unsigned key){
 				clnt->g_keys.t = clnt->g_keys.t ? 0 : 1;
 			}
 			break;
-		case 'M':
-		case 'm':
+		case 'T':
+		case 't':
 			clnt->game_mode = MESSAGE;
 			break;
 		case 'N':

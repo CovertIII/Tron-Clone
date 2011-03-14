@@ -19,6 +19,8 @@
 #define MAX_VEL 200
 #define LENGTH 15
 
+static double linear(double val, double mx1, double mn1, double mx2, double mn2);
+
 typedef struct playertype {
 	vector2 p;
 	vector2 v;
@@ -117,9 +119,6 @@ int player_ck_self(player plyr){
 
 	vector2 t1 = {-plyr->length*cos(plyr->th)+plyr->p.x, -plyr->length*sin(plyr->th)+plyr->p.y};
 	vector2 t2 = { plyr->length*cos(plyr->th)+plyr->p.x, plyr->length*sin(plyr->th)+plyr->p.y};
-	//There is a bug in checking the trails.  It appears as if you can go through the last segment of any trail.  That
-	//is because when you turn a trail off it does not update the collision trail to add a point to where you turned it
-	//off.  Therefore you can go through part of the draw trail, which is updated every frame. 	
 	if(traillist_intersect(plyr->trails, t1, t2)){
 		return 1;
 	}
@@ -261,16 +260,23 @@ void player_get_update(player *actors, ENetPacket * packet, ALuint * buz, ALuint
 	*actors[plyr_id] = splyr;
 	actors[plyr_id]->trails = tmp_trail;
 	actors[plyr_id]->ghost = tmp_part;
+	
+	double vel = linear(v2Len(actors[plyr_id]->v), 200, 70, 1.2, 0.8);
+
+	alSourcef(eng[plyr_id], AL_PITCH, vel);
 
 	if(tt != actors[plyr_id]->trailtoggle){
 		actors[plyr_id]->trailtoggle = tt;
 		player_toggle(actors[plyr_id]);
-		tt ? alSourceStop(buz[plyr_id]) : alSourcePlay(buz[plyr_id]);
+		if(!actors[plyr_id]->dead){
+			tt ? alSourceStop(buz[plyr_id]) : alSourcePlay(buz[plyr_id]);
+		}
 	}
 
 	if (dd != actors[plyr_id]->dead){
 		alSourceStop(eng[plyr_id]);
-		s_add_snd(death, actors[plyr_id]->p);
+		alSourceStop(buz[plyr_id]);
+		s_add_snd(death, v2sMul(ALPscale, actors[plyr_id]->p));
 		vector2 tmp1 = {-actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, -actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
 		vector2 tmp2 = { actors[plyr_id]->length*cos(actors[plyr_id]->th)+actors[plyr_id]->p.x, actors[plyr_id]->length*sin(actors[plyr_id]->th)+actors[plyr_id]->p.y};
 		actors[plyr_id]->ghost = particles_init(tmp1, tmp2, actors[plyr_id]->v);
@@ -278,3 +284,6 @@ void player_get_update(player *actors, ENetPacket * packet, ALuint * buz, ALuint
 
 }
 
+static double linear(double val, double mx1, double mn1, double mx2, double mn2){
+	return (mx2-mn2)/(mx1-mn1)*(val - mx1) + mx2;
+}
