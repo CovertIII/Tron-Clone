@@ -1,6 +1,6 @@
 Tron-Clone Game
 ===============
-This is a Tron Clone Game.  Drive you "cycle" around while
+This is a Tron Clone Game.  Drive your "cycle" around while
 trying to avoid the trails made by yourself other players. 
 
 Install
@@ -8,7 +8,7 @@ Install
 Right now the game is built for Mac OS X v10.6.  If you
 have that you should be able to run the binaries with no
 problem.  If not, you have to build it from source. The game
-uses GLUT, enet, and tpl libraries.  Find them and install
+uses GLUT, enet, tpl, OpenAL, Ogg, and Vorbis libraries.  Find them and install
 them.  After that, if you on a Mac, just run the 'make' command and it should 
 work.  If you're on a linux machine you'll have to change source 
 headers from <GLUT/GLUT.h> to three seperate headers.  Then change
@@ -29,13 +29,18 @@ tserver: This starts a tron server where many people can play
 tclient:  This is the client to play against different people connected 
 	the tserver.  When it start you must enter in the name or IP address
 	of the server.  If you want to host a game you must start the tserver
-	progam first, then type localhost or 127.0.0.1 or ::1 to connect to
+	progam first, then type localhost or 127.0.0.1 to connect to
 	your server.  If other people want to play they must type the IP
 	address of your computer on your network.
+
+	Push 'n' to change you name.  Push 't' to send a message.
 
 	Once connected push the space bar to indicate you are ready.  While 
 	playing use the arrow keys to move yourself around.  Up and down make
 	you go faster and slower.  'a' will make you power slide and 's' will 
 	toggle your trail on or off.
 
-
+Misc.
+=====
+The sound files were taken from BZflag, SuperTuxKart, and Apple's OpenAL
+test sample project.

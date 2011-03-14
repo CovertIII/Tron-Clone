@@ -211,6 +211,9 @@ void user_render(user usr, int x, int y){
 			case 3:
 				strcpy(status, "Waiting");
 				break;
+			case 4:
+				strcpy(status, "Idle");
+				break;
 		}
 		glColor3f((float)i/(float)usr->user_num,0.2,1-(float)i/(float)usr->user_num);
 
@@ -282,7 +285,9 @@ int user_set_arena_id(user usr){
 void user_all_not_ready(user usr){
 	usernode *cycle = usr->head;
 	while(cycle != NULL){
-		cycle->ui.status = NOT_READY;
+		if(cycle->ui.status != IDLE){
+			cycle->ui.status = NOT_READY;
+		}
 		cycle = cycle->next;
 	}
 }
@@ -455,7 +460,15 @@ void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet
 	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
 		//find the user that equals the event peer
 		if(cycle->ui.peer == event->peer){
-			cycle->ui.status = READY;
+			if(cycle->ui.status == NOT_READY){
+				cycle->ui.status = READY;
+			}
+			else if(cycle->ui.status == READY){
+				cycle->ui.status = IDLE;
+			}
+			else if(cycle->ui.status == IDLE){
+				cycle->ui.status = NOT_READY;
+			}
 
 			//send the updated user via send_new_client	
 			user_send_new_client(usr,cycle->ui.peer, server, channel);

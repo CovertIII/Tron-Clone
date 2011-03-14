@@ -3,13 +3,16 @@ Tue Mar  8 23:50:01 EST 2011
 Short term goals
  1. Change name from Tron-Clone to Trail Blazer.
  3. Announce the winner after the game.  (or tie if there was one)
+	DONE
  3. Allow a player to make himself idle, so as not to participte in the
     following rounds.
+	DONE
  4. Have a player idle after a minute of inactivity.
 
 Long Term Goals:
  1. Change player shape (insead of a line, maybe a rombus)
  2. Add sound.
+	DONE
  3. have a make install in the Makefile.
  4. Make is a mac application bundle
  5. Port to linux and windows.

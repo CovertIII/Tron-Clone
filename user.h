@@ -2,6 +2,7 @@
 #define READY 1
 #define PLAYING 2
 #define WAITING 3
+#define IDLE 4
 
 typedef struct usertype *user;
 
@@ -74,7 +75,7 @@ int user_check_states(user usr);
 int user_set_arena_id(user usr);
 
 /* user_all_not_ready:
- * set the state of all users in usr to not ready
+ * set the state of all users in usr to not ready execpt idle users
  */
 void user_all_not_ready(user usr);
 
