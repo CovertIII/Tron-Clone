@@ -272,7 +272,7 @@ int user_set_arena_id(user usr){
 	int arena_id = 0;
 	usernode *cycle = usr->head;
 	while(cycle != NULL){
-		if(cycle->ui.status== READY){
+		if(cycle->ui.status == READY){
 			cycle->ui.arena_plyr_id = arena_id;
 			cycle->ui.status = PLAYING;
 			arena_id++;
@@ -481,7 +481,7 @@ void user_sget_send_pstate(user usr, ENetHost * server,  ENetEvent * event, enet
 void user_send_arena_ids(user usr, int channel){
 	usernode * cycle;
 	for (cycle = usr->head; cycle != NULL; cycle = cycle->next){
-		int id_p = cycle->ui.arena_plyr_id;
+		int id_p = cycle->ui.status != IDLE ? cycle->ui.arena_plyr_id : 0;
 		tpl_node *tn;
 		void *addr;
 		size_t len;
@@ -507,6 +507,34 @@ int user_get_arena_id(ENetPacket * packet){
 	tpl_free(tn);
 
 	return id;
+}
+
+void user_disconnect_all(user usr, ENetHost * host){
+	usernode * cycle;
+	ENetEvent event;
+	for (cycle = usr->head; cycle != NULL; cycle = cycle->next)
+	{
+		int connection = 1;
+		enet_peer_disconnect (cycle->ui.peer, 0);
+		/* Allow up to 3 seconds for the disconnect to succeed
+		and drop any packets received packets.*/
+		while (enet_host_service (host, & event, 3000) > 0){
+			switch (event.type){
+				case ENET_EVENT_TYPE_RECEIVE:
+					enet_packet_destroy (event.packet);
+				break;
+	
+				case ENET_EVENT_TYPE_DISCONNECT:
+					connection = 0;
+					break;
+			}
+		}
+	
+		/* We've arrived here, so the disconnect attempt didn't */
+		/* succeed yet.  Force the connection down.             */
+		if(connection)
+			{enet_peer_reset (cycle->ui.peer);}
+	}
 }
 
 int user_peer_aid(user usr, ENetPeer * peer){

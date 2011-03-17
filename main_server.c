@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <signal.h>
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -15,15 +16,17 @@ unsigned long int prev;
 server tronserver;
 
 unsigned long int getthetime();
+void leave(int sig);
 
 void clean_up(void){
-	printf("Cleaning up resources used for tserver");
+	printf("Cleaning up resources used by tserver\n");
 	server_free(tronserver);
 	enet_host_destroy(enetserver);
 }
 
 int main (int argc, char ** argv){
 	prev = getthetime();
+	(void) signal(SIGINT,leave);
 
 	if (enet_initialize () != 0){
       fprintf (stderr, "An error occurred while initializing ENet.\n");
@@ -54,12 +57,13 @@ int main (int argc, char ** argv){
     /* Main game loop */
 	while(1){
 		int i, index, temp;
+		char buf[80];
 		if (enet_host_service (enetserver, & event, 10) > 0){
 			switch (event.type){
     		    case ENET_EVENT_TYPE_CONNECT:
-    		    	printf ("A new client connected from %x: %u.\n", 
-					        event.peer -> address.host, 
-					        event.peer -> address.port);
+					enet_address_get_host_ip(&event.peer->address, buf, sizeof buf);
+    		    	printf ("A new client connected from %s\n", 
+					        buf);
 					server_add_user(tronserver, event.peer);
     		      break;
     		
@@ -96,3 +100,7 @@ unsigned long int getthetime()
 	return tv.tv_sec*1000000+tv.tv_usec;
 }
 
+void leave(int sig) {
+	printf("\nProgram interupted.  Cleaning up.\n");
+    exit(sig);
+}

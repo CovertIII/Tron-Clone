@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 #include <string.h>
 #include <math.h>
 #include <GLUT/glut.h>
@@ -22,6 +23,8 @@ ENetAddress address;
 ENetEvent event;
 client tclient;
 
+void leave(int sig);
+
 void alCleanUp(void){
 	context = alcGetCurrentContext();
 	device = alcGetContextsDevice(context);
@@ -31,6 +34,7 @@ void alCleanUp(void){
 }
 
 void clean_up(void){
+	enet_host_destroy(enet_client);
 	client_free(tclient);
 }
 
@@ -146,29 +150,33 @@ void idle(void)
 
 int main(int argc, char** argv)
 {
-  glutInit(&argc, argv);
+	(void) signal(SIGINT,leave);
+	glutInit(&argc, argv);
   
-  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-  glutInitWindowSize(800, 600);
-  
-  glutCreateWindow("Tron Clone Client");
-	
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize(800, 600);
+
+	glutCreateWindow("Tron Clone Client");
+
 	init();
-	
+
 	glutIgnoreKeyRepeat(1);
 	glutSpecialFunc(pressKey);
 	glutSpecialUpFunc(releaseKey); 
-	
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutIdleFunc(idle);
-    
+
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutIdleFunc(idle);
+
 	glutKeyboardFunc(processNormalKeys);
 	glutKeyboardUpFunc(releaseNormalKeys);
-    glutMainLoop();
-	client_free(tclient);
-   	enet_host_destroy(enet_client);
-    return EXIT_SUCCESS;
-	
+	glutMainLoop();
+	return EXIT_SUCCESS;
+}
+
+
+void leave(int sig) {
+	printf("\nProgram interupted.  Cleaning up.\n");
+    exit(sig);
 }
 

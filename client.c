@@ -116,7 +116,7 @@ void client_disconnect(client clnt){
 		arena_free(clnt->c_game);
 		clnt->c_game = NULL;
 	}
-	chat_add_message(clnt->c_chat, "Client", "You're disconnected from the server.");
+	chat_add_message(clnt->c_chat, "Client", "You have been disconnected from the server.");
 }
 
 void client_update(client clnt, double dt){
@@ -183,15 +183,20 @@ void client_render(client clnt){
 	}
 	switch(clnt->game_state){
 		case LOBBY:
+			if(clnt->game_mode != NOT_CONNECTED){
+				user_render(clnt->c_users, clnt->w.x, clnt->w.y);
+			}
+			glColor3f(1, 1, 1);
 			chat_render(clnt->c_chat, 0);
-			user_render(clnt->c_users, clnt->w.x, clnt->w.y);
 			break;
 		case GAME:
 			arena_render(clnt->c_game);
+			glColor3f(1, 1, 1);
 			chat_render(clnt->c_chat, 1);
 			break;
 		case POSTGAME:
 			arena_render(clnt->c_game);
+			glColor3f(1, 1, 1);
 			chat_render(clnt->c_chat, 1);
 			double ratio = glutGet(GLUT_WINDOW_WIDTH)/(double)glutGet(GLUT_WINDOW_HEIGHT);
 			double wx = ratio * clnt->w.y;
@@ -202,6 +207,7 @@ void client_render(client clnt){
 			break;
 		case PREGAME:
 			arena_render(clnt->c_game);
+			glColor3f(1, 1, 1);
 			chat_render(clnt->c_chat, 1);
 			if(clnt->timer > 0 ){
 				//draw timer here.

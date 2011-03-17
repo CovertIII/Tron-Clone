@@ -19,7 +19,7 @@ tserver: main_server.o server.o $(NETWORK) $(GAMEOBJ)
 main_server.o: main_server.c server.h
 	$(CC) $(CFLAGS) -c main_server.c
 
-tclient: main_client.o client.o $(NETWORK) $(GAMEOBJ)
+tclient: main_client.o client.o $(NETWORK) $(GAMEOBJ) $(AUDIOOBJ)
 	$(CC) $(CFLAGS) $(AUDIO) $(AUDIOOBJ) $(NETLIBS) client.o $(MACFLAGS) main_client.o $(NETWORK) $(GAMEOBJ) -o tclient 
 
 main_client.o: main_client.c client.h vector2.h

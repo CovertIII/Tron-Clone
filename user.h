@@ -123,3 +123,5 @@ void user_send_arena_ids(user usr, int channel);
 
 int user_get_arena_id(ENetPacket * packet);
 
+void user_disconnect_all(user usr, ENetHost * host);
+
