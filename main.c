@@ -1,8 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <GLUT/glut.h>
 #include <enet/enet.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#else
+#include <GL/glut.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 #include "vector2.h"
 #include "arena.h"
 

@@ -1,11 +1,14 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
 #include "vector2.h"
 #include "plist.h"
 #include "traillist.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <GLUT/glut.h>
-
 
 typedef struct{
 	plist draw_trail;

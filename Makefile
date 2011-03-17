@@ -1,12 +1,13 @@
-CFLAGS=-g
-MACFLAGS=-framework GLUT -framework OpenGL 
-LINUXFLAGS=-lGL -GLU -lglut
-COCOA=-framework Cocoa
-NETLIBS= /usr/local/lib/libenet.a /usr/local/lib/libtpl.a
-AUDIO=-framework OpenAL /usr/local/lib/libvorbis.a /usr/local/lib/libogg.a /usr/local/lib/libvorbisfile.a
-PROGRAMS=tron
-GAMEOBJ=vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
-NETWORK=user.o chat.o
+CFLAGS = -g
+MACFLAGS = -framework GLUT -framework OpenGL 
+LINUXG = -lGL -GLU -lglut
+LINUXA = -lopenal -logg -lvorbis -lvorbisfile
+COCOA = -framework Cocoa
+NETLIBS = /usr/local/lib/libenet.a /usr/local/lib/libtpl.a
+AUDIO = -framework OpenAL /usr/local/lib/libvorbis.a /usr/local/lib/libogg.a /usr/local/lib/libvorbisfile.a
+PROGRAMS = tron
+GAMEOBJ = vector2.o particle_sys.o collison.o plist.o traillist.o player.o arena.o
+NETWORK = user.o chat.o
 AUDIOOBJ = load_sound.o sound_list.o
 
 CC=gcc

@@ -1,11 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <GLUT/GLUT.h>
-#include <tpl.h>
-#include <enet/enet.h>
+#ifdef __APPLE__
+#include <GLUT/glut.h>
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#else
+#include <GL/glut.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
+#include <tpl.h>
+#include <enet/enet.h>
 #include "vector2.h"
 #include "sound_list.h"
 #include "arena.h"

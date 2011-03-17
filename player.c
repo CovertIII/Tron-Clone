@@ -1,18 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+#ifdef __APPLE__
 #include <GLUT/glut.h>
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#else
+#include <GL/glut.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 #include <enet/enet.h>
 #include <tpl.h>
 
 #include "vector2.h"
-#include "sound_list.h"
-#include "player.h"
-#include "math.h"
-#include "traillist.h"
 #include "collison.h"
+#include "sound_list.h"
+#include "traillist.h"
 #include "particle_sys.h"
+#include "player.h"
 
 #define VELOCITY 100
 #define MIN_VEL 75

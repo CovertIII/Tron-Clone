@@ -3,9 +3,15 @@
 #include <signal.h>
 #include <string.h>
 #include <math.h>
+#ifdef __APPLE__
 #include <GLUT/glut.h>
 #include <OpenAL/al.h>
 #include <OpenAL/alc.h>
+#else
+#include <GL/glut.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#endif
 #include <enet/enet.h>
 #include "vector2.h"
 #include "client.h"
