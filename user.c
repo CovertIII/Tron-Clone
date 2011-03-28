@@ -193,11 +193,14 @@ void user_render(user usr, int x, int y){
 	int i = 0;
 	usernode *cycle = usr->head;
 	char buf[50];
-	sprintf(buf, "User     Score    Status    Ping");	
 	glPushMatrix();
 	glLoadIdentity();
-	renderBitmapString(10, y-40, GLUT_BITMAP_HELVETICA_10, buf);
+	renderBitmapString(10, y-40, GLUT_BITMAP_HELVETICA_10, "User");
+	renderBitmapString(60, y-40, GLUT_BITMAP_HELVETICA_10, "Score");
+	renderBitmapString(99, y-40, GLUT_BITMAP_HELVETICA_10, "Status");
+	renderBitmapString(150, y-40, GLUT_BITMAP_HELVETICA_10, "Ping");
 	glPopMatrix();
+
 
 	while(cycle != NULL){
 		char buf[50];
@@ -228,7 +231,7 @@ void user_render(user usr, int x, int y){
 		sprintf(buf, "%d", cycle->ui.score);	
 		renderBitmapString(60, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		sprintf(buf, "%s", status);	
-		renderBitmapString(80, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
+		renderBitmapString(99, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		sprintf(buf, "%d", cycle->ui.ping);	
 		renderBitmapString(150, y-52-i*12, GLUT_BITMAP_HELVETICA_10, buf);
 		glPopMatrix();

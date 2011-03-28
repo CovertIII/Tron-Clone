@@ -1,7 +1,8 @@
-Tron-Clone Game
+TrailBlazer
 ===============
-This is a Tron Clone Game.  Drive your "cycle" around while
-trying to avoid the trails made by yourself other players. 
+This is a Tron clone game.  It is a multiplayer game meant to be played
+over a LAN (but not over the internet).  Drive your "cycle" around while
+ trying to avoid the trails made by yourself and other players. 
 
 Install
 =======
@@ -10,10 +11,26 @@ have that you should be able to run the binaries with no
 problem.  If not, you have to build it from source. The game
 uses GLUT, enet, tpl, OpenAL, Ogg, and Vorbis libraries.  Find them and install
 them.  After that, if you on a Mac, just run the 'make' command and it should 
-work.  If you're on a linux machine you'll have to change source 
-headers from <GLUT/GLUT.h> to three seperate headers.  Then change
-the flags in the makefile to the correct flags.  On windows 
+work.  If on a linux machine change the flags in the makefile to the correct flags.
+I have them there already you just have to rename the macro.  On windows 
 look into MinGW to compile it. 
+
+Here's where to find the libraries:
+ o GLUT - http://www.opengl.org/resources/libraries/glut/ 
+   Comes on a Mac, no need to download.  On linux use a
+   pakage manager to find it.
+ o OpenAL - http://connect.creativelabs.com/openal/default.aspx
+   Comes on the mac -- no need to download.  
+ o enet - http://enet.bespin.org/
+   "...a relatively thin, simple and robust network communication layer 
+   on top of UDP (User Datagram Protocol)." This takes care of networking
+   for me.
+ o tpl - http://tpl.sourceforge.net/
+   "Tpl is a library for serializing C data." I use this to pack up
+   data before I send it out with enet.
+ o Ogg Vorbis - http://xiph.org/downloads/
+   Download libogg and libvorbis.  Use these to decode the sound files
+   so OpenAL can play them.
 
 Gameplay
 ========
@@ -43,4 +60,6 @@ tclient:  This is the client to play against different people connected
 Misc.
 =====
 The sound files were taken from BZflag, SuperTuxKart, and Apple's OpenAL
-test sample project.
+test sample project.  If you don't like those sounds, then find sounds you
+ do like convert them into a Ogg Vorbis file rename them to the ones in
+the sound_data folder.

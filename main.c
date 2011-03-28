@@ -335,8 +335,10 @@ int main(int argc, char** argv)
 	glutSpecialUpFunc(SreleaseKey);
 	glutKeyboardFunc(pressKey);
 	glutKeyboardUpFunc(releaseKey);
+	
 	glutDisplayFunc(display);
   	glutReshapeFunc(reshape);
+	
 	glutPostRedisplay();
 	
 	glutTimerFunc(TIMERMSECS, numbers, 0);

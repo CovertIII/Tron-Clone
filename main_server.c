@@ -1,4 +1,4 @@
-#include <sys/time.h>
+
 #include <signal.h>
 #include <time.h>
 #include <stdlib.h>
@@ -73,8 +73,9 @@ int main (int argc, char ** argv){
     		    	break;
     		
     		    case ENET_EVENT_TYPE_DISCONNECT:		
-					printf ("A client disconnected from %x: %u.\n", 
-					        event.peer -> address.host, 
+					enet_address_get_host_ip(&event.peer->address, buf, sizeof buf);
+					printf ("A client disconnected from %s: %u.\n", 
+					        buf, 
 					        event.peer -> address.port);
 					
 					server_remove_user(tronserver, event.peer);	
